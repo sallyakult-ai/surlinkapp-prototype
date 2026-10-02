@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>SURLINK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #8fb6d8;
+      --primary-dark: #5f86a6;
+      --primary-darker: #3170a4;
+      --primary-light: #b8d6f1;
+      --primary-soft: #f0fdfa;
+      --accent: #f59e0b;
+      --accent-soft: #fef3c7;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #58b2d9;
+      --danger: #ef4444;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+      --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      min-height: 100vh; -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border); padding: 0 1rem;
+    }
+    .nav-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; gap: 1rem;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.55rem;
+      font-weight: 800; font-size: 1.2rem; color: var(--primary-dark);
+      text-decoration: none; flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--primary), #8fb6d8);
+      border-radius: 10px; display: grid; place-items: center;
+      color: snow; font-size: 1rem; box-shadow: 0 2px 8px rgba(36, 79, 122, 0.35);
+    }
+    .nav-search {
+      flex: 1; max-width: 420px; position: relative;
+    }
+    .nav-search-box {
+      display: flex; align-items: center;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 999px; padding: 0 0.35rem 0 0.9rem;
+      transition: all 0.2s; gap: 0.25rem;
+    }
+    .nav-search-box:focus-within {
+      background: snow; border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.18);
+    }
+    .nav-search-box svg.search-ico {
+      width: 16px; height: 16px; color: var(--text-muted); flex-shrink: 0;
+    }
+    .nav-search-box:focus-within svg.search-ico { color: var(--primary); }
+    .nav-search input {
+      flex: 1; border: none; background: transparent; outline: none;
+      padding: 0.6rem 0.4rem; font-size: 0.875rem; font-family: inherit;
+      color: var(--text); min-width: 0;
+    }
+    .nav-search input::placeholder { color: #94a3b8; }
+    .search-clear {
+      width: 28px; height: 28px; border-radius: 50%; border: none;
+      background: transparent; color: var(--text-muted); cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      font-size: 1rem; line-height: 1; flex-shrink: 0;
+    }
+    .search-clear.show { display: flex; }
+    .search-clear:hover { background: #e2e8f0; color: var(--text); }
+    .search-suggest {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: snow; border: 1px solid var(--border);
+      border-radius: 14px; box-shadow: var(--shadow-lg);
+      z-index: 120; display: none; overflow: hidden;
+      max-height: 320px; overflow-y: auto;
+    }
+    .search-suggest.show { display: block; animation: slideDown 0.15s ease; }
+    .suggest-item {
+      padding: 0.7rem 1rem; cursor: pointer; display: flex;
+      align-items: center; gap: 0.65rem; border: none; background: none;
+      width: 100%; text-align: left; font-family: inherit;
+      transition: background 0.12s;
+    }
+    .suggest-item:hover, .suggest-item.active { background: var(--primary-soft); }
+    .suggest-item .s-icon { font-size: 1rem; flex-shrink: 0; }
+    .suggest-item .s-text { flex: 1; min-width: 0; }
+    .suggest-item .s-title {
+      font-size: 0.85rem; font-weight: 600; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .suggest-item .s-meta {
+      font-size: 0.72rem; color: var(--text-muted);
+    }
+    .suggest-hint {
+      padding: 0.55rem 1rem; font-size: 0.72rem; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.04em; background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+    .suggest-empty {
+      padding: 1rem; text-align: center; color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .search-chips-bar {
+      display: none; flex-wrap: wrap; gap: 0.4rem;
+      margin-bottom: 0.85rem; align-items: center;
+    }
+    .search-chips-bar.show { display: flex; }
+    .active-chip {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.65rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600;
+      background: var(--primary-light); color: var(--primary-dark);
+      border: 1px solid #5f86a6;
+    }
+    .active-chip button {
+      border: none; background: none; cursor: pointer;
+      color: var(--primary-dark); font-size: 0.9rem; line-height: 1;
+      padding: 0 0.1rem; opacity: 0.7;
+    }
+    .active-chip button:hover { opacity: 1; }
+    .interest-active-bar {
+      display: none; flex-wrap: wrap; gap: 0.4rem;
+      margin-bottom: 0.85rem; align-items: center;
+      padding: 0.65rem 0.85rem; background: snow;
+      border: 1px solid var(--border); border-radius: 12px;
+    }
+    .interest-active-bar.show { display: flex; }
+    .interest-active-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.03em; margin-right: 0.25rem;
+    }
+    .nav-actions { display: flex; gap: 0.4rem; align-items: center; }
+    .nav-btn {
+      padding: 0.45rem 0.9rem; border-radius: 999px;
+      font-weight: 600; font-size: 0.8rem; border: none; cursor: pointer;
+      transition: all 0.2s; font-family: inherit; white-space: nowrap;
+    }
+    .nav-btn-ghost { background: transparent; color: var(--text-muted); }
+    .nav-btn-ghost:hover { color: var(--primary); background: var(--primary-light); }
+    .nav-btn-primary {
+      background: var(--primary); color: snow;
+      box-shadow: 0 2px 8px rgba(13,148,136,0.3);
+    }
+    .nav-btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .nav-btn-icon {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: grid; place-items: center; padding: 0;
+      background: var(--bg); color: var(--text-muted); position: relative;
+    }
+    .nav-btn-icon:hover { background: var(--primary-light); color: var(--primary); }
+    .badge-count {
+      position: absolute; top: -2px; right: -2px;
+      background: var(--danger); color: snow;
+      font-size: 0.65rem; font-weight: 700;
+      min-width: 16px; height: 16px; border-radius: 999px;
+      display: grid; place-items: center; padding: 0 3px;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(145deg, #3170a4 0%, #5f86a6 40%, #8fb6d8 100%);
+      color: snow; padding: 2.75rem 1.25rem 3rem;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute;
+      top: -40%; right: -15%; width: 55%; height: 180%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-inner { max-width: 1120px; margin: 0 auto; position: relative; z-index: 1; }
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.18); padding: 0.3rem 0.8rem;
+      border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+      margin-bottom: 1rem; backdrop-filter: blur(4px);
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 4vw, 2.5rem);
+      font-weight: 800; line-height: 1.2; max-width: 600px; margin-bottom: 0.75rem;
+    }
+    .hero p { font-size: 1rem; opacity: 0.92; max-width: 480px; margin-bottom: 1.5rem; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 0.65rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.7rem 1.3rem; border-radius: 12px;
+      font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer;
+      transition: all 0.2s; text-decoration: none; font-family: inherit;
+    }
+    .btn-snow {
+      background: snow; color: var(--primary-dark);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .btn-snow:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .btn-outline-snow {
+      background: transparent; color: snow;
+      border: 2px solid rgba(255,255,255,0.45);
+    }
+    .btn-outline-snow:hover { border-color: snow; background: rgba(255,255,255,0.12); }
+    .stats { display: flex; gap: 2rem; margin-top: 2rem; flex-wrap: wrap; }
+    .stat-item strong { display: block; font-size: 1.45rem; font-weight: 800; }
+    .stat-item span { font-size: 0.8rem; opacity: 0.85; }
+
+    /* LAYOUT */
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
+    .section { padding: 1.75rem 0 2.5rem; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .section-title { font-size: 1.25rem; font-weight: 700; }
+    .section-sub { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.15rem; }
+    .result-count {
+      font-size: 0.8rem; font-weight: 600; color: var(--primary-dark);
+      background: var(--primary-light); padding: 0.3rem 0.7rem; border-radius: 999px;
+    }
+
+    /* PROFILE */
+    .profile-panel {
+      background: snow; border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 1.35rem;
+      margin: 1.25rem 0 0; display: none;
+      box-shadow: var(--shadow); animation: slideDown 0.25s ease;
+    }
+    .profile-panel.show { display: block; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .profile-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.9rem; margin-top: 0.9rem;
+    }
+    .form-group label {
+      display: block; font-size: 0.75rem; font-weight: 600;
+      color: var(--text-muted); margin-bottom: 0.3rem; text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .form-group select {
+      width: 100%; padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 0.875rem; font-family: inherit; background: snow;
+    }
+    .form-group select:focus { outline: none; border-color: var(--primary); }
+    .interest-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+    .interest-tag {
+      padding: 0.35rem 0.8rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 500;
+      border: 1.5px solid var(--border); background: snow;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .interest-tag:hover { border-color: var(--primary); color: var(--primary-dark); }
+    .interest-tag.selected {
+      background: var(--primary-light); border-color: var(--primary);
+      color: var(--primary-dark); font-weight: 600;
+    }
+
+    /* FILTERS */
+    .filters-bar {
+      display: flex; gap: 0.45rem; flex-wrap: wrap;
+      margin-bottom: 0.75rem; align-items: center;
+    }
+    .filter-chip {
+      padding: 0.45rem 1rem; border-radius: 999px;
+      font-size: 0.825rem; font-weight: 600;
+      border: 1.5px solid var(--border); background: snow;
+      color: var(--text-muted); cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .filter-chip:hover {
+      border-color: var(--primary); color: var(--primary-dark);
+      background: var(--primary-soft);
+    }
+    .filter-chip.active {
+      border-color: var(--primary); background: var(--primary);
+      color: snow; box-shadow: 0 2px 8px rgba(26, 93, 148, 0.3);
+    }
+    .filter-chip .chip-count {
+      font-size: 0.7rem; font-weight: 700;
+      background: rgba(0,0,0,0.08); padding: 0.1rem 0.4rem;
+      border-radius: 999px; min-width: 1.2rem; text-align: center;
+    }
+    .filter-chip.active .chip-count { background: rgba(255,255,255,0.25); }
+
+    /* SUB-FILTERS (Lomba scope, Magang mode, etc.) */
+    .subfilter-wrap {
+      display: none; margin-bottom: 1.15rem;
+      animation: slideDown 0.2s ease;
+    }
+    .subfilter-wrap.show { display: block; }
+    .subfilter-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
+    }
+    .subfilters {
+      display: flex; gap: 0.4rem; flex-wrap: wrap;
+    }
+    .sub-chip {
+      padding: 0.4rem 0.9rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid var(--border); background: snow;
+      color: var(--text-muted); cursor: pointer;
+      transition: all 0.15s; font-family: inherit;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .sub-chip:hover {
+      border-color: #b45309; color: #b45309; background: #fffbeb;
+    }
+    .sub-chip.active {
+      border-color: #b45309; background: #f59e0b; color: snow;
+      box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+    }
+    .sub-chip .chip-count {
+      font-size: 0.68rem; font-weight: 700;
+      background: rgba(0,0,0,0.08); padding: 0.08rem 0.35rem;
+      border-radius: 999px;
+    }
+    .sub-chip.active .chip-count { background: rgba(255,255,255,0.3); }
+
+    /* Magang sub-filter accent (green) */
+    .subfilter-wrap[data-for="Magang"] .sub-chip:hover {
+      border-color: #15803d; color: #15803d; background: #f0fdf4;
+    }
+    .subfilter-wrap[data-for="Magang"] .sub-chip.active {
+      border-color: #15803d; background: #16a34a; color: snow;
+      box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+    }
+    /* Beasiswa sub (blue) */
+    .subfilter-wrap[data-for="Beasiswa"] .sub-chip:hover {
+      border-color: #1d4ed8; color: #1d4ed8; background: #eff6ff;
+    }
+    .subfilter-wrap[data-for="Beasiswa"] .sub-chip.active {
+      border-color: #1d4ed8; background: #2563eb; color: snow;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+    }
+
+    .sort-select {
+      margin-left: auto; padding: 0.45rem 0.8rem;
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600; font-family: inherit;
+      color: var(--text-muted); background: snow; cursor: pointer;
+    }
+    .sort-select:focus { outline: none; border-color: var(--primary); }
+
+    /* CARDS */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.15rem;
+    }
+    .opp-card {
+      background: var(--card); border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer; display: flex; flex-direction: column;
+    }
+    .opp-card:hover {
+      transform: translateY(-5px); box-shadow: var(--shadow-lg);
+      border-color: #5f86a6;
+    }
+    .opp-card.saved-card { border-color: var(--accent); }
+    .opp-card-top { padding: 1.15rem 1.2rem 0.8rem; flex: 1; }
+    .opp-meta {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 0.55rem; gap: 0.5rem; flex-wrap: wrap;
+      padding-right: 1.4rem; /* space for sparkle */
+    }
+    .opp-type {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; padding: 0.25rem 0.6rem; border-radius: 6px;
+    }
+    .type-beasiswa { background: #dbeafe; color: #1d4ed8; }
+    .type-lomba { background: #fef3c7; color: #b45309; }
+    .type-magang { background: #dcfce7; color: #15803d; }
+    .type-volunteer { background: #fce7f3; color: #be185d; }
+    .type-pelatihan { background: #e0e7ff; color: #4338ca; }
+    .match-badge {
+      font-size: 0.72rem; font-weight: 700; color: var(--primary-dark);
+      background: var(--primary-light); padding: 0.2rem 0.55rem;
+      border-radius: 6px; white-space: nowrap;
+    }
+    .scope-badge {
+      font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+    }
+    .scope-internasional { background: #fce7f3; color: #9d174d; }
+    .scope-nasional { background: #dbeafe; color: #1e40af; }
+    .scope-regional { background: #fef3c7; color: #92400e; }
+    .scope-kampus { background: #d1fae5; color: #065f46; }
+    .scope-online { background: #e0e7ff; color: #3730a3; }
+    .opp-title {
+      font-size: 1.02rem; font-weight: 700; margin-bottom: 0.35rem; line-height: 1.35;
+    }
+    .opp-desc {
+      font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .opp-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .verify-badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px;
+    }
+    .verify-kampus { background: #ccfbf1; color: #0f766e; }
+    .verify-partner { background: #e0e7ff; color: #4338ca; }
+    .verify-komunitas { background: #f1f5f9; color: #475569; }
+    .local-badge {
+      background: var(--accent-soft); color: #b45309;
+      font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px;
+    }
+    .opp-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.8rem 1.2rem; border-top: 1px solid var(--border); background: #fafbfc;
+    }
+    .deadline {
+      font-size: 0.78rem; font-weight: 600;
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .deadline.urgent { color: var(--danger); }
+    .deadline.soon { color: var(--accent); }
+    .deadline.ok { color: var(--success); }
+    .save-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.15rem; padding: 0.2rem; transition: transform 0.15s; line-height: 1;
+    }
+    .save-btn:hover { transform: scale(1.2); }
+
+    .empty-state {
+      text-align: center; padding: 3.5rem 1.5rem;
+      color: var(--text-muted); grid-column: 1 / -1;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.35rem; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55);
+      z-index: 200; display: none; align-items: center; justify-content: center;
+      padding: 1rem; backdrop-filter: blur(4px);
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: snow; border-radius: 20px;
+      max-width: 540px; width: 100%; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.3);
+      animation: modalUp 0.25s ease;
+    }
+    @keyframes modalUp {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-header {
+      padding: 1.4rem 1.5rem 0.6rem;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .modal-close {
+      background: #f1f5f9; border: none; width: 36px; height: 36px;
+      border-radius: 50%; font-size: 1.25rem; cursor: pointer;
+      color: var(--text-muted); flex-shrink: 0;
+    }
+    .modal-close:hover { background: #e2e8f0; }
+    .modal-body { padding: 0.4rem 1.5rem 1.5rem; }
+    .modal-info {
+      background: var(--bg); border-radius: 12px; padding: 1rem; margin: 1rem 0;
+    }
+    .modal-info-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.875rem; margin-bottom: 0.45rem;
+    }
+    .modal-info-row:last-child { margin-bottom: 0; }
+    .modal-info-row span { color: var(--text-muted); }
+    .modal-actions {
+      display: flex; gap: 0.65rem; margin-top: 1.25rem; flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--primary); color: snow;
+      box-shadow: 0 2px 8px rgba(12, 68, 118, 0.3);
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #f1f5f9; color: var(--text); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-accent { background: var(--accent-soft); color: #b45309; }
+    .btn-accent:hover { background: #fde68a; }
+
+    .toast {
+      position: fixed; bottom: 1.5rem; left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #0f172a; color: snow;
+      padding: 0.85rem 1.4rem; border-radius: 12px;
+      font-weight: 600; font-size: 0.875rem; z-index: 300;
+      opacity: 0; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      max-width: 90vw; text-align: center;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .drawer-overlay {
+      position: fixed; inset: 0; background: rgba(15,23,42,0.4);
+      z-index: 150; display: none;
+    }
+    .drawer-overlay.show { display: block; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: min(380px, 100vw); background: snow;
+      z-index: 160; transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+      display: flex; flex-direction: column;
+    }
+    .drawer.show { transform: translateX(0); }
+    .drawer-header {
+      padding: 1.2rem 1.3rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 1rem; }
+    .saved-item {
+      padding: 0.9rem; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 0.7rem;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .saved-item:hover { border-color: var(--primary); }
+    .saved-item h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .saved-item p { font-size: 0.75rem; color: var(--text-muted); }
+
+    footer {
+      text-align: center; padding: 2rem 1rem 2.5rem;
+      color: var(--text-muted); font-size: 0.8rem;
+      border-top: 1px solid var(--border); margin-top: 1rem;
+    }
+    footer strong { color: var(--primary-dark); }
+
+
+    /* ═══ CUTE ORNAMENTS & EXTRA FEATURES ═══ */
+    .float-deco {
+      position: absolute; pointer-events: none; user-select: none;
+      animation: floaty 6s ease-in-out infinite;
+      opacity: 0.85; font-size: 1.4rem; z-index: 0;
+    }
+    .float-deco.d1 { top: 12%; right: 8%; animation-delay: 0s; }
+    .float-deco.d2 { top: 30%; right: 25%; animation-delay: 1.2s; font-size: 1.1rem; }
+    .float-deco.d3 { bottom: 18%; right: 6%; animation-delay: 2.4s; font-size: 1.3rem; }
+    .float-deco.d4 { top: 30%; right: 28%; animation-delay: 0.8s; font-size: 1rem; opacity: 0.5; }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-12px) rotate(8deg); }
+    }
+    .hero-wave {
+      position: absolute; bottom: -1px; left: 0; right: 0;
+      height: 28px; overflow: hidden; line-height: 0;
+    }
+    .hero-wave svg { width: 100%; height: 28px; display: block; }
+
+    .tip-banner {
+      max-width: 1120px; margin: -0.5rem auto 0; padding: 0 1.25rem;
+      position: relative; z-index: 2;
+    }
+    .tip-inner {
+      background: snow; border: 1.5px solid #fde68a;
+      border-radius: 14px; padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      box-shadow: 0 4px 14px rgba(245,158,11,0.12);
+      animation: slideDown 0.3s ease;
+    }
+    .tip-emoji { font-size: 1.4rem; flex-shrink: 0; }
+    .tip-text { flex: 1; font-size: 0.85rem; color: var(--text); }
+    .tip-text strong { color: #b45309; }
+    .tip-close {
+      border: none; background: #fef3c7; width: 28px; height: 28px;
+      border-radius: 50%; cursor: pointer; font-size: 0.9rem;
+      color: #92400e; flex-shrink: 0;
+    }
+    .tip-close:hover { background: #fde68a; }
+
+    .quick-actions {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin: 1rem 0 0.25rem;
+    }
+    .qa-btn {
+      padding: 0.45rem 0.85rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 600; border: 1.5px dashed var(--border);
+      background: snow; color: var(--text-muted); cursor: pointer;
+      font-family: inherit; transition: all 0.15s;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .qa-btn:hover {
+      border-style: solid; border-color: var(--primary);
+      color: var(--primary-dark); background: var(--primary-soft);
+    }
+    .qa-btn.hot {
+      border-color: #fca5a5; border-style: solid;
+      background: #fef2f2; color: #b91c1c;
+    }
+    .qa-btn.hot:hover { background: #fee2e2; }
+
+    .opp-card .sparkle {
+      position: absolute; top: 10px; right: 10px;
+      font-size: 0.9rem; animation: sparkle 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+    .opp-card.hot-deadline {
+      border-color: #fca5a5;
+      background: linear-gradient(180deg, #fff 0%, #fef2f2 100%);
+    }
+    .streak-pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #92400e; font-size: 0.75rem; font-weight: 700;
+      padding: 0.3rem 0.7rem; border-radius: 999px;
+      border: 1px solid #fbbf24;
+    }
+
+    .mascot-bar {
+      display: flex; align-items: center; gap: 0.6rem;
+      margin-top: 1.25rem; padding: 0.7rem 1rem;
+      background: rgba(255,255,255,0.15); border-radius: 14px;
+      max-width: 420px; backdrop-filter: blur(6px);
+    }
+    .mascot-bar .mascot { font-size: 1.8rem; animation: bounce 2.5s ease-in-out infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+      60% { transform: translateY(-3px); }
+    }
+    .mascot-bar p { font-size: 0.82rem; opacity: 0.95; line-height: 1.35; }
+
+    .confetti-piece {
+      position: fixed; width: 8px; height: 8px; border-radius: 2px;
+      z-index: 400; pointer-events: none;
+      animation: confettiFall 1.2s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(120px) rotate(720deg); }
+    }
+
+    .theme-toggle {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: grid; place-items: center; padding: 0;
+      background: var(--bg); color: var(--text-muted);
+      border: none; cursor: pointer; font-size: 1.05rem;
+      transition: all 0.2s;
+    }
+    .theme-toggle:hover { background: var(--primary-light); color: var(--primary); }
+
+    /* Dark mode */
+    body.dark {
+      --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
+      --text-muted: #94a3b8; --border: #334155;
+      --primary-soft: #215077; --primary-light: #3c6c92;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+      --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.4);
+    }
+    body.dark .nav {
+      background: rgba(15,23,42,0.95); border-color: #334155;
+    }
+    body.dark .nav-search-box { background: #1e293b; border-color: #334155; }
+    body.dark .nav-search-box:focus-within { background: #1e293b; }
+    body.dark .filter-chip, body.dark .sub-chip, body.dark .sort-select,
+    body.dark .qa-btn, body.dark .interest-tag {
+      background: #1e293b; border-color: #334155; color: #94a3b8;
+    }
+    body.dark .filter-chip.active { background: var(--primary); color: snow; border-color: var(--primary); }
+    body.dark .opp-footer { background: #0f172a; }
+    body.dark .profile-panel, body.dark .modal, body.dark .drawer,
+    body.dark .search-suggest, body.dark .tip-inner {
+      background: #1e293b; border-color: #334155;
+    }
+    body.dark .modal-info { background: #0f172a; }
+    body.dark .btn-secondary { background: #334155; color: #f1f5f9; }
+    body.dark .nav-btn-icon, body.dark .theme-toggle { background: #1e293b; }
+    body.dark .interest-active-bar { background: #1e293b; border-color: #334155; }
+    body.dark .active-chip { background: #204b6e; color: #6c94b7; border-color: #477193; }
+    body.dark .suggest-hint { background: #0f172a; border-color: #334155; }
+    body.dark .opp-card.hot-deadline {
+      background: linear-gradient(180deg, #1e293b 0%, #3f1f1f 100%);
+      border-color: #7f1d1d;
+    }
+
+    .fab-share {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 90;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), #8fb6d8);
+      color: snow; border: none; cursor: pointer;
+      font-size: 1.3rem; box-shadow: 0 6px 20px rgba(90, 146, 230, 0.4);
+      transition: transform 0.2s; display: grid; place-items: center;
+    }
+    .fab-share:hover { transform: scale(1.08) rotate(-8deg); }
+    .fab-share:active { transform: scale(0.95); }
+
+    .progress-ring-wrap {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .mini-bar {
+      flex: 1; height: 6px; background: var(--border); border-radius: 999px;
+      overflow: hidden; max-width: 120px;
+    }
+    .mini-bar-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary), #7aa3c0);
+      border-radius: 999px; transition: width 0.5s ease;
+    }
+
+    .cute-divider {
+      text-align: center; color: var(--text-muted); font-size: 0.85rem;
+      margin: 0.5rem 0; letter-spacing: 0.3em; opacity: 0.5;
+    }
+
+    footer .footer-deco {
+      font-size: 1.2rem; margin-bottom: 0.4rem;
+      letter-spacing: 0.4em;
+    }
+
+
+    /* ═══ HIGH-VALUE FEATURES ═══ */
+    .notif-panel {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      width: min(340px, 92vw); background: var(--card);
+      border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: var(--shadow-lg); z-index: 130;
+      display: none; max-height: min(400px, 70vh); overflow: hidden;
+      flex-direction: column;
+    }
+    .notif-panel.show { display: flex; animation: slideDown 0.2s ease; }
+    /* Mobile: full-width sheet so nothing is cut off */
+    @media (max-width: 640px) {
+      .notif-panel {
+        position: fixed;
+        top: auto; bottom: 0; left: 0; right: 0;
+        width: 100%; max-width: 100%;
+        max-height: min(75vh, 520px);
+        border-radius: 20px 20px 0 0;
+        z-index: 250;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+      }
+      .notif-list { max-height: calc(75vh - 56px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+      .notif-backdrop {
+        display: none; position: fixed; inset: 0;
+        background: rgba(15,23,42,0.45); z-index: 240;
+      }
+      .notif-backdrop.show { display: block; }
+    }
+    .notif-head {
+      padding: 0.85rem 1rem; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 700; font-size: 0.9rem;
+    }
+    .notif-list { overflow-y: auto; flex: 1; }
+    .notif-item {
+      padding: 0.8rem 1rem; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.12s;
+      display: flex; gap: 0.65rem; align-items: flex-start;
+    }
+    .notif-item:hover { background: var(--primary-soft); }
+    .notif-item.unread { background: linear-gradient(90deg, var(--primary-soft), transparent); }
+    .notif-item .n-ico { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+    .notif-item .n-body { flex: 1; min-width: 0; }
+    .notif-item .n-title { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .notif-item .n-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .notif-empty { padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+    .week-panel {
+      background: linear-gradient(135deg, #3170a4 0%, #5f86a6 50%, #8fb6d8 100%);
+      border-radius: 16px; padding: 1.15rem 1.25rem; margin-bottom: 1.15rem;
+      color: snow; position: relative; overflow: hidden;
+    }
+    .week-panel::after {
+      content: '📅'; position: absolute; right: 1rem; top: 0.5rem;
+      font-size: 3rem; opacity: 0.15;
+    }
+    .week-panel h3 { font-size: 1rem; font-weight: 800; margin-bottom: 0.25rem; }
+    .week-panel .week-sub { font-size: 0.8rem; opacity: 0.9; margin-bottom: 0.85rem; }
+    .week-items { display: flex; gap: 0.55rem; overflow-x: auto; padding-bottom: 0.25rem; }
+    .week-card {
+      flex: 0 0 auto; width: 200px; background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px); border-radius: 12px; padding: 0.75rem;
+      cursor: pointer; transition: background 0.15s; border: 1px solid rgba(255,255,255,0.2);
+    }
+    .week-card:hover { background: rgba(255,255,255,0.25); }
+    .week-card .wc-type { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; }
+    .week-card .wc-title { font-size: 0.82rem; font-weight: 700; margin: 0.25rem 0; line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .week-card .wc-due { font-size: 0.72rem; font-weight: 600; color: #fef3c7; }
+
+    .stats-mini {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .stat-mini-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 0.7rem 0.6rem; text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-mini-card .sm-val { font-size: 1.25rem; font-weight: 800; color: var(--primary-dark); }
+    body.dark .stat-mini-card .sm-val { color: #8fb6d8; }
+    .stat-mini-card .sm-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; margin-top: 0.15rem; }
+
+    .compare-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 95;
+      background: var(--card); border-top: 2px solid var(--primary);
+      padding: 0.75rem 1rem; display: none;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+    }
+    .compare-bar.show { display: block; animation: slideDown 0.2s ease; }
+    .compare-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+    }
+    .compare-chip {
+      background: var(--primary-light); color: var(--primary-dark);
+      padding: 0.35rem 0.7rem; border-radius: 999px; font-size: 0.78rem;
+      font-weight: 600; display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .compare-chip button {
+      border: none; background: none; cursor: pointer; color: inherit; font-size: 0.95rem;
+    }
+
+    .compare-modal .modal { max-width: 720px; }
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .compare-table th, .compare-table td {
+      padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--border);
+      text-align: left; vertical-align: top;
+    }
+    .compare-table th { color: var(--text-muted); font-weight: 600; width: 28%; }
+    .compare-table td { font-weight: 500; }
+
+    .match-why {
+      background: var(--primary-soft); border-radius: 10px;
+      padding: 0.75rem 0.9rem; margin-top: 0.75rem;
+      font-size: 0.82rem; color: var(--primary-dark);
+      border: 1px solid #8fb6d8;
+    }
+    body.dark .match-why { color: #8fb6d8; border-color: #366a95; }
+    .match-why strong { display: block; margin-bottom: 0.3rem; font-size: 0.78rem; }
+
+    .checklist {
+      margin-top: 1rem; background: var(--bg); border-radius: 12px; padding: 0.9rem;
+    }
+    .checklist h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.55rem; }
+    .check-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.35rem 0; font-size: 0.82rem; cursor: pointer;
+    }
+    .check-item input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+    .check-item.done span { text-decoration: line-through; color: var(--text-muted); }
+    .check-progress {
+      height: 5px; background: var(--border); border-radius: 999px;
+      margin-top: 0.5rem; overflow: hidden;
+    }
+    .check-progress-fill {
+      height: 100%; background: var(--primary); border-radius: 999px; transition: width 0.3s;
+    }
+
+    .recent-row {
+      display: none; gap: 0.5rem; overflow-x: auto; margin-bottom: 1rem;
+      padding-bottom: 0.25rem;
+    }
+    .recent-row.show { display: flex; }
+    .recent-chip {
+      flex: 0 0 auto; padding: 0.4rem 0.75rem; border-radius: 999px;
+      background: snow; border: 1px solid var(--border); font-size: 0.75rem;
+      font-weight: 600; color: var(--text-muted); cursor: pointer;
+      font-family: inherit; transition: all 0.15s;
+    }
+    body.dark .recent-chip { background: #1e293b; border-color: #334155; }
+    .recent-chip:hover { border-color: var(--primary); color: var(--primary-dark); }
+
+    .compare-toggle {
+      position: static; /* never absolute — sits in footer */
+      width: 30px; height: 30px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: snow;
+      cursor: pointer; display: grid; place-items: center;
+      font-size: 0.9rem; padding: 0; flex-shrink: 0;
+      transition: all 0.15s; color: var(--text-muted);
+      z-index: auto;
+    }
+    .compare-toggle:hover {
+      border-color: var(--primary); color: var(--primary); background: var(--primary-soft);
+    }
+    .compare-toggle.on {
+      background: var(--primary); border-color: var(--primary); color: snow;
+    }
+    .opp-card { position: relative; }
+    .opp-footer-actions {
+      display: flex; align-items: center; gap: 0.4rem; margin-left: auto;
+    }
+
+    .nav-btn-icon.wrap { position: relative; }
+
+    @media (max-width: 640px) {
+      .stats-mini { grid-template-columns: repeat(2, 1fr); }
+    }
+
+
+    /* Living ornaments */
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(40px);
+      pointer-events: none; z-index: 0; opacity: 0.35;
+    }
+    .blob.b1 {
+      width: 180px; height: 180px; background: #8fb6d8;
+      top: -40px; left: -30px; animation: blobMove 12s ease-in-out infinite;
+    }
+    .blob.b2 {
+      width: 140px; height: 140px; background: #fcd34d;
+      bottom: 20px; right: 10%; animation: blobMove 10s ease-in-out infinite reverse;
+    }
+    @keyframes blobMove {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(20px, -15px) scale(1.08); }
+      66% { transform: translate(-15px, 10px) scale(0.95); }
+    }
+    .section-ornament {
+      text-align: center; margin: 0.25rem 0 0.75rem;
+      font-size: 0.9rem; letter-spacing: 0.5em; opacity: 0.4;
+      user-select: none;
+    }
+    .card-shine {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 45%, transparent 50%);
+      background-size: 200% 100%; opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .opp-card:hover .card-shine {
+      opacity: 1; animation: shine 0.8s ease;
+    }
+    @keyframes shine {
+      from { background-position: 100% 0; }
+      to { background-position: -100% 0; }
+    }
+    .live-dot {
+      display: inline-block; width: 7px; height: 7px;
+      background: #b8d6f1; border-radius: 50%;
+      margin-right: 0.35rem; animation: pulseDot 1.5s ease infinite;
+      box-shadow: 0 0 0 0 rgba(154, 190, 203, 0.5);
+    }
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(154, 190, 203, 0.5); }
+      70% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+      100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+    .mood-picker {
+      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.9rem;
+      align-items: center;
+    }
+    .mood-label {
+      font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.03em;
+    }
+    .mood-btn {
+      padding: 0.4rem 0.75rem; border-radius: 999px;
+      border: 1.5px solid var(--border); background: var(--card);
+      font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      font-family: inherit; color: var(--text-muted); transition: all 0.15s;
+    }
+    .mood-btn:hover { border-color: var(--primary); color: var(--primary-dark); }
+    .mood-btn.active {
+      border-color: #8b5cf6; background: #ede9fe; color: #5b21b6;
+      box-shadow: 0 2px 8px rgba(139,92,246,0.25);
+    }
+    body.dark .mood-btn.active { background: #4c1d95; color: #e9d5ff; border-color: #8b5cf6; }
+
+    .digest-card {
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 1rem 1.15rem; margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .digest-card h3 {
+      font-size: 0.95rem; font-weight: 800; margin-bottom: 0.35rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .digest-card p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+    .digest-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .digest-actions .btn { padding: 0.45rem 0.9rem; font-size: 0.78rem; }
+
+    .note-box {
+      margin-top: 0.85rem; background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 10px; padding: 0.7rem 0.85rem;
+    }
+    body.dark .note-box { background: #422006; border-color: #92400e; }
+    .note-box label {
+      font-size: 0.75rem; font-weight: 700; color: #92400e; display: block; margin-bottom: 0.35rem;
+    }
+    body.dark .note-box label { color: #fcd34d; }
+    .note-box textarea {
+      width: 100%; min-height: 56px; border: 1.5px solid #fde68a;
+      border-radius: 8px; padding: 0.5rem; font-family: inherit;
+      font-size: 0.82rem; resize: vertical; background: snow; color: var(--text);
+    }
+    body.dark .note-box textarea { background: #1e293b; border-color: #92400e; color: #f1f5f9; }
+    .note-box textarea:focus { outline: none; border-color: var(--accent); }
+
+    .path-steps {
+      display: flex; gap: 0.35rem; margin-top: 0.75rem; flex-wrap: wrap;
+    }
+    .path-step {
+      flex: 1; min-width: 70px; text-align: center; padding: 0.45rem 0.3rem;
+      background: var(--bg); border-radius: 10px; font-size: 0.7rem;
+      color: var(--text-muted); font-weight: 600; border: 1px solid var(--border);
+    }
+    .path-step.done { background: var(--primary-light); color: var(--primary-dark); border-color: #99f6e4; }
+    .path-step .ps-num { display: block; font-size: 0.95rem; margin-bottom: 0.15rem; }
+
+    .floating-fish {
+      position: fixed; bottom: 5.5rem; left: 1rem; z-index: 80;
+      font-size: 1.6rem; cursor: pointer; user-select: none;
+      animation: swim 4s ease-in-out infinite;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+      background: none; border: none;
+    }
+    @keyframes swim {
+      0%, 100% { transform: translateX(0) rotate(-5deg); }
+      50% { transform: translateX(12px) rotate(5deg); }
+    }
+    .floating-fish:hover { transform: scale(1.15); }
+
+    @media (max-width: 640px) {
+      .nav-inner { flex-wrap: wrap; height: auto; padding: 0.6rem 0; gap: 0.5rem; }
+      .nav-search { max-width: 100%; order: 3; width: 100%; flex: 1 1 100%; }
+      .stats { gap: 1.25rem; }
+      .hero { padding: 2rem 1rem 2.5rem; }
+      .sort-select { margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo" onclick="scrollTop(); return false;">
+        <div class="logo-icon">🔎</div>
+        SURLINK
+      </a>
+      <div class="nav-search">
+        <div class="nav-search-box">
+          <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="search" id="searchInput" placeholder="Cari beasiswa, lomba, magang, BI..." autocomplete="off"
+            oninput="onSearchInput()" onfocus="onSearchFocus()" onkeydown="onSearchKey(event)" />
+          <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()" title="Hapus">×</button>
+        </div>
+        <div class="search-suggest" id="searchSuggest"></div>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Mode gelap/terang">🌙</button>
+        <div style="position:relative">
+          <button class="nav-btn nav-btn-icon wrap" id="notifBtn" onclick="toggleNotif(event)" title="Notifikasi">
+            🔔
+            <span class="badge-count" id="notifCount" style="display:none">0</span>
+          </button>
+          <div class="notif-panel" id="notifPanel">
+            <div class="notif-head">
+              <span>Notifikasi</span>
+              <button class="nav-btn nav-btn-ghost" style="font-size:0.75rem;padding:0.2rem 0.5rem" onclick="markAllNotifRead()">Semua dibaca</button>
+            </div>
+            <div class="notif-list" id="notifList"></div>
+          </div>
+        </div>
+        <button class="nav-btn nav-btn-icon" onclick="toggleDrawer()" title="Tersimpan">
+          🔖
+          <span class="badge-count" id="savedCount" style="display:none">0</span>
+        </button>
+        <button class="nav-btn nav-btn-ghost" onclick="toggleProfile()">Profil</button>
+        <button class="nav-btn nav-btn-primary" onclick="showToast('Fitur masuk akan tersedia di versi berikutnya! 🎉')">Masuk</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="float-deco d1">⭐</div>
+    <div class="float-deco d2">🎯</div>
+    <div class="float-deco d3">✨</div>
+    <div class="float-deco d4">💫</div>
+    <div class="hero-inner">
+      <div class="badge-pill">🏝️ Khusus Mahasiswa Universitas Bangka Belitung</div>
+      <h1>Satu tautan terverifikasi untuk semua peluang mahasiswa Bangka Belitung</h1>
+      <p>Lomba, beasiswa, magang, volunteer & pelatihan — terkumpul, terverifikasi, dan dipersonalisasi sesuai minatmu.</p>
+      <div class="hero-cta">
+        <button class="btn btn-snow" onclick="document.getElementById('opportunities').scrollIntoView({behavior:'smooth'})">
+          Jelajahi Peluang →
+        </button>
+        <button class="btn btn-outline-snow" onclick="toggleProfile()">Atur Preferensi</button>
+      </div>
+      <div class="stats">
+        <div class="stat-item"><strong id="statOpp">0</strong><span>Peluang aktif</span></div>
+        <div class="stat-item"><strong>~10.000</strong><span>Mahasiswa Bangka Belitung</span></div>
+        <div class="stat-item"><strong>100%</strong><span>Info terverifikasi</span></div>
+      </div>
+      <div class="mascot-bar">
+        <span class="mascot">🐠</span>
+        <p id="mascotMsg">Hai! Aku <strong>Sully</strong>, si ikan penjelajah peluang. Yuk cari yang cocok buatmu hari ini!</p>
+      </div>
+    </div>
+    <div class="hero-wave">
+      <svg viewBox="0 0 1200 28" preserveAspectRatio="none"><path d="M0,20 C150,35 350,0 600,14 C850,28 1050,5 1200,18 L1200,28 L0,28 Z" fill="#f1f5f9"/></svg>
+    </div>
+  </section>
+
+  <div class="tip-banner" id="tipBanner">
+    <div class="tip-inner">
+      <span class="tip-emoji" id="tipEmoji">💡</span>
+      <div class="tip-text" id="tipText"><strong>Tips hari ini:</strong> Atur minat di Profil supaya Match Score muncul di kartu peluang.</div>
+      <button class="tip-close" onclick="dismissTip()" title="Tutup">×</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="profile-panel" id="profilePanel">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;">Profil & Preferensi</h3>
+          <p class="section-sub">Klik minat = filter aktif langsung · Match Score ikut terhitung</p>
+        </div>
+        <button class="nav-btn nav-btn-ghost" onclick="toggleProfile()">Tutup ✕</button>
+      </div>
+      <div class="profile-grid">
+        <div class="form-group">
+          <label>Jurusan</label>
+          <select id="profileMajor" onchange="updateProfile()">
+            <option value="">Pilih jurusan</option>
+            <option value="Bisnis Digital">Bisnis Digital</option>
+            <option value="Manajemen">Manajemen</option>
+            <option value="Akuntansi">Akuntansi</option>
+            <option value="Teknik Informatika">Teknik Informatika</option>
+            <option value="Agroteknologi">Agroteknologi</option>
+            <option value="Ilmu Hukum">Ilmu Hukum</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <select id="profileSemester" onchange="updateProfile()">
+            <option value="">Pilih semester</option>
+            <option value="1-2">1–2 (Baru)</option>
+            <option value="3-4">3–4</option>
+            <option value="5-6">5–6</option>
+            <option value="7+">7+</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:1rem;">
+        <label>Minat (klik untuk pilih)</label>
+        <div class="interest-tags" id="interestTags">
+          <span class="interest-tag" data-val="Beasiswa">Beasiswa</span>
+          <span class="interest-tag" data-val="Lomba">Lomba</span>
+          <span class="interest-tag" data-val="Magang">Magang</span>
+          <span class="interest-tag" data-val="Volunteer">Volunteer</span>
+          <span class="interest-tag" data-val="Pelatihan">Pelatihan</span>
+          <span class="interest-tag" data-val="Startup">Startup</span>
+          <span class="interest-tag" data-val="Riset">Riset</span>
+          <span class="interest-tag" data-val="Tech">Tech</span>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:1.15rem;" onclick="applyProfile()">
+        Simpan & Perbarui Rekomendasi
+      </button>
+    </div>
+  </div>
+
+  <section class="section" id="opportunities">
+    <div class="container">
+      <div class="stats-mini" id="statsMini">
+        <div class="stat-mini-card"><div class="sm-val" id="smViewed">0</div><div class="sm-label">Dilihat</div></div>
+        <div class="stat-mini-card"><div class="sm-val" id="smSaved">0</div><div class="sm-label">Tersimpan</div></div>
+        <div class="stat-mini-card"><div class="sm-val" id="smRemind">0</div><div class="sm-label">Reminder</div></div>
+        <div class="stat-mini-card"><div class="sm-val" id="smMatch">—</div><div class="sm-label">Avg Match</div></div>
+      </div>
+
+      <div class="week-panel" id="weekPanel">
+        <h3>🎯 Fokus Minggu Ini</h3>
+        <p class="week-sub">Peluang dengan deadline dalam 14 hari — prioritaskan ini dulu</p>
+        <div class="week-items" id="weekItems"></div>
+      </div>
+
+      <div class="recent-row" id="recentRow"></div>
+
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Peluang untuk Kamu</h2>
+          <p class="section-sub" id="recoSub">Filter · sub-filter · minat aktif · search — semua bisa digabung</p>
+        </div>
+        <span class="result-count" id="resultCount">0 peluang</span>
+      </div>
+
+      <div class="digest-card" id="digestCard">
+        <h3><span class="live-dot"></span> Ringkasan Pintar untukmu</h3>
+        <p id="digestText">Atur profil & minat untuk mendapatkan ringkasan peluang yang paling relevan hari ini.</p>
+        <div class="digest-actions">
+          <button class="btn btn-primary" onclick="applyDigestFilter()">Terapkan saran</button>
+          <button class="btn btn-secondary" onclick="refreshDigest()">🔄 Acak ulang</button>
+        </div>
+      </div>
+
+      <div class="mood-picker" id="moodPicker">
+        <span class="mood-label">Mood hari ini</span>
+        <button class="mood-btn" data-mood="ambisius" onclick="setMood(this,'ambisius')">🚀 Ambisius</button>
+        <button class="mood-btn" data-mood="eksplor" onclick="setMood(this,'eksplor')">🧭 Eksplor</button>
+        <button class="mood-btn" data-mood="santai" onclick="setMood(this,'santai')">😎 Santai</button>
+        <button class="mood-btn" data-mood="lokal" onclick="setMood(this,'lokal')">🏝️ Lokal dulu</button>
+      </div>
+
+      <div class="section-ornament">✧ ･ ｡ ☆ ｡ ･ ✧</div>
+
+      <div class="quick-actions" id="quickActions">
+        <button class="qa-btn hot" onclick="filterUrgent()">🔥 Deadline dekat</button>
+        <button class="qa-btn" onclick="filterLocal()">🏝️ Lokal Babel</button>
+        <button class="qa-btn" onclick="surpriseMe()">🎲 Surprise me!</button>
+        <button class="qa-btn" onclick="filterVerified()">✓ Terverifikasi Kampus</button>
+        <span class="streak-pill" id="streakPill" title="Peluang yang kamu simpan">⭐ 0 tersimpan</span>
+      </div>
+      <div class="cute-divider">· · · ✦ · · ·</div>
+
+      <!-- PRIMARY FILTERS -->
+      <div class="filters-bar" id="filters">
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">
+          Semua <span class="chip-count" id="count-all">0</span>
+        </button>
+        <button class="filter-chip" data-filter="Beasiswa" onclick="setFilter('Beasiswa', this)">
+          🎓 Beasiswa <span class="chip-count" id="count-Beasiswa">0</span>
+        </button>
+        <button class="filter-chip" data-filter="Lomba" onclick="setFilter('Lomba', this)">
+          🏆 Lomba <span class="chip-count" id="count-Lomba">0</span>
+        </button>
+        <button class="filter-chip" data-filter="Magang" onclick="setFilter('Magang', this)">
+          💼 Magang <span class="chip-count" id="count-Magang">0</span>
+        </button>
+        <button class="filter-chip" data-filter="Volunteer" onclick="setFilter('Volunteer', this)">
+          🤝 Volunteer <span class="chip-count" id="count-Volunteer">0</span>
+        </button>
+        <button class="filter-chip" data-filter="Pelatihan" onclick="setFilter('Pelatihan', this)">
+          📚 Pelatihan <span class="chip-count" id="count-Pelatihan">0</span>
+        </button>
+        <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+          <option value="deadline">Urut: Deadline terdekat</option>
+          <option value="match">Urut: Match Score</option>
+          <option value="newest">Urut: Terbaru</option>
+        </select>
+      </div>
+
+      <!-- SUB-FILTER: LOMBA (scope) -->
+      <div class="subfilter-wrap" id="subLomba" data-for="Lomba">
+        <div class="subfilter-label">🏆 Tingkat Lomba</div>
+        <div class="subfilters">
+          <button class="sub-chip active" data-sub="all" onclick="setSubFilter('all', this)">
+            Semua tingkat <span class="chip-count" id="subcount-lomba-all">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Internasional" onclick="setSubFilter('Internasional', this)">
+            🌍 Internasional <span class="chip-count" id="subcount-lomba-Internasional">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Nasional" onclick="setSubFilter('Nasional', this)">
+            🇮🇩 Nasional <span class="chip-count" id="subcount-lomba-Nasional">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Regional" onclick="setSubFilter('Regional', this)">
+            🗺️ Regional <span class="chip-count" id="subcount-lomba-Regional">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Kampus" onclick="setSubFilter('Kampus', this)">
+            🏫 Kampus <span class="chip-count" id="subcount-lomba-Kampus">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-FILTER: BEASISWA (scope) -->
+      <div class="subfilter-wrap" id="subBeasiswa" data-for="Beasiswa">
+        <div class="subfilter-label">🎓 Cakupan Beasiswa</div>
+        <div class="subfilters">
+          <button class="sub-chip active" data-sub="all" onclick="setSubFilter('all', this)">
+            Semua <span class="chip-count" id="subcount-beasiswa-all">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Internasional" onclick="setSubFilter('Internasional', this)">
+            🌍 Luar Negeri <span class="chip-count" id="subcount-beasiswa-Internasional">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Nasional" onclick="setSubFilter('Nasional', this)">
+            🇮🇩 Nasional <span class="chip-count" id="subcount-beasiswa-Nasional">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Regional" onclick="setSubFilter('Regional', this)">
+            🗺️ Regional / Daerah <span class="chip-count" id="subcount-beasiswa-Regional">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SUB-FILTER: MAGANG (mode) -->
+      <div class="subfilter-wrap" id="subMagang" data-for="Magang">
+        <div class="subfilter-label">💼 Jenis Magang</div>
+        <div class="subfilters">
+          <button class="sub-chip active" data-sub="all" onclick="setSubFilter('all', this)">
+            Semua <span class="chip-count" id="subcount-magang-all">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Full-time" onclick="setSubFilter('Full-time', this)">
+            Full-time <span class="chip-count" id="subcount-magang-Full-time">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Part-time" onclick="setSubFilter('Part-time', this)">
+            Part-time <span class="chip-count" id="subcount-magang-Part-time">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Hybrid" onclick="setSubFilter('Hybrid', this)">
+            Hybrid / Remote <span class="chip-count" id="subcount-magang-Hybrid">0</span>
+          </button>
+          <button class="sub-chip" data-sub="Riset" onclick="setSubFilter('Riset', this)">
+            🔬 Riset <span class="chip-count" id="subcount-magang-Riset">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active search & interest chips -->
+      <div class="search-chips-bar" id="searchChipsBar"></div>
+      <div class="interest-active-bar" id="interestActiveBar"></div>
+
+      <div class="card-grid" id="cardGrid"></div>
+    </div>
+  </section>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header">
+        <div style="flex:1;padding-right:0.5rem;">
+          <span class="opp-type" id="mType"></span>
+          <h3 style="font-size:1.2rem;font-weight:700;margin-top:0.5rem;line-height:1.3;" id="mTitle"></h3>
+        </div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.75rem;" id="mBadges"></div>
+        <p id="mDesc" style="color:var(--text-muted);font-size:0.925rem;"></p>
+        <div class="modal-info">
+          <div class="modal-info-row"><span>Deadline</span><strong id="mDeadline"></strong></div>
+          <div class="modal-info-row"><span>Penyelenggara</span><strong id="mOrganizer"></strong></div>
+          <div class="modal-info-row"><span>Lokasi</span><strong id="mLocation"></strong></div>
+          <div class="modal-info-row" id="mScopeRow" style="display:none;"><span>Tingkat / Jenis</span><strong id="mScope"></strong></div>
+        </div>
+        <div class="match-why" id="mMatchWhy" style="display:none"></div>
+        <div class="path-steps" id="mPathSteps" style="display:none">
+          <div class="path-step" id="ps1"><span class="ps-num">👀</span>Lihat</div>
+          <div class="path-step" id="ps2"><span class="ps-num">🔖</span>Simpan</div>
+          <div class="path-step" id="ps3"><span class="ps-num">🔔</span>Reminder</div>
+          <div class="path-step" id="ps4"><span class="ps-num">📋</span>Siap</div>
+          <div class="path-step" id="ps5"><span class="ps-num">🚀</span>Daftar</div>
+        </div>
+        <div class="checklist" id="mChecklist" style="display:none">
+          <h4>📋 Checklist persiapan</h4>
+          <div id="mCheckItems"></div>
+          <div class="check-progress"><div class="check-progress-fill" id="mCheckFill" style="width:0%"></div></div>
+        </div>
+        <div class="note-box" id="mNoteBox">
+          <label>📝 Catatan pribadi (hanya di perangkatmu)</label>
+          <textarea id="mNotes" placeholder="Contoh: butuh essay 500 kata, minta rekomendasi ke dosen X..." onchange="saveNote()" onblur="saveNote()"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="startApply()">Daftar Sekarang</button>
+          <button class="btn btn-secondary" onclick="setReminder()">🔔 Ingatkan Saya</button>
+          <button class="btn btn-accent" id="mSaveBtn" onclick="toggleSaveFromModal()">🔖 Simpan</button>
+          <button class="btn btn-secondary" id="mCompareBtn" onclick="toggleCompareFromModal()">⚖️ Bandingkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h3 style="font-weight:700;font-size:1.05rem;">🔖 Tersimpan</h3>
+      <button class="nav-btn nav-btn-ghost" onclick="toggleDrawer()">Tutup</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+
+  <!-- COMPARE BAR -->
+  <div class="compare-bar" id="compareBar">
+    <div class="compare-inner">
+      <strong style="font-size:0.85rem">⚖️ Bandingkan:</strong>
+      <div id="compareChips" style="display:flex;gap:0.4rem;flex-wrap:wrap;flex:1"></div>
+      <button class="btn btn-primary" style="padding:0.45rem 1rem;font-size:0.8rem" onclick="openCompare()">Bandingkan</button>
+      <button class="btn btn-secondary" style="padding:0.45rem 0.8rem;font-size:0.8rem" onclick="clearCompare()">Batal</button>
+    </div>
+  </div>
+
+  <!-- COMPARE MODAL -->
+  <div class="modal-overlay compare-modal" id="compareModal" onclick="if(event.target===this)closeCompare()">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-size:1.15rem;font-weight:700">⚖️ Perbandingan Peluang</h3>
+        <button class="modal-close" onclick="closeCompare()">×</button>
+      </div>
+      <div class="modal-body" id="compareBody"></div>
+    </div>
+  </div>
+
+  <div class="notif-backdrop" id="notifBackdrop" onclick="closeNotif()"></div>
+  <div class="toast" id="toast"></div>
+
+  <button class="floating-fish" id="luckyFish" onclick="luckyDraw()" title="Klik untuk peluang keberuntungan!">🐠</button>
+  <button class="fab-share" onclick="shareSurlink()" title="Bagikan SURLINK">🔗</button>
+
+  <footer>
+    <div class="footer-deco">SURLINK</div>
+    <strong>SURLINK</strong> · Prototype Interaktif · Kelompok 3 · Prodi Bisnis Digital · Bangka Belitung · 2026<br>
+    “Satu tautan terverifikasi untuk semua peluang mahasiswa Bangka Belitung.”
+  </footer>
+
+  <script>
+    // scope: for Lomba/Beasiswa = Internasional|Nasional|Regional|Kampus
+    // mode: for Magang = Full-time|Part-time|Hybrid|Riset
+    const opportunities = [
+      // LOMBA
+      { id:1, title:"Hackathon Babel Tech Challenge", type:"Lomba", scope:"Regional",
+        desc:"Kompetisi coding & solusi digital untuk isu kepulauan. Hadiah total Rp 25 juta + mentoring startup nasional.",
+        organizer:"Komunitas Tech Babel", location:"Online + Final Pangkalpinang",
+        deadline:"2026-10-12", verify:"komunitas", local:true,
+        tags:["Lomba","Tech","Startup"], added:1 },
+      { id:2, title:"Kompetisi Business Plan UBB 2026", type:"Lomba", scope:"Kampus",
+        desc:"Ajang tahunan BEM UBB. Proposal bisnis inovatif fokus potensi lokal Bangka Belitung. Hadiah Rp 15 juta.",
+        organizer:"BEM Universitas Bangka Belitung", location:"Pangkalpinang",
+        deadline:"2026-10-05", verify:"kampus", local:true,
+        tags:["Lomba","Startup","Bisnis"], added:2 },
+      { id:3, title:"Lomba Debat Hukum Antar Fakultas", type:"Lomba", scope:"Kampus",
+        desc:"Debat hukum tingkat universitas. Terbuka semua jurusan. Juara mewakili UBB di tingkat nasional.",
+        organizer:"BEM Fakultas Hukum UBB", location:"Kampus UBB",
+        deadline:"2026-10-18", verify:"kampus", local:true,
+        tags:["Lomba","Hukum"], added:3 },
+      { id:4, title:"Kompetisi Essay Nasional Generasi Emas", type:"Lomba", scope:"Nasional",
+        desc:"Lomba essay tingkat nasional bertema pembangunan daerah. Hadiah jutaan + publikasi media nasional.",
+        organizer:"Kementerian Pemuda dan Olahraga", location:"Online",
+        deadline:"2026-11-01", verify:"partner", local:false,
+        tags:["Lomba","Essay","Nasional"], added:4 },
+      { id:5, title:"National Business Case Competition 2026", type:"Lomba", scope:"Nasional",
+        desc:"Kompetisi case study bisnis tingkat nasional. Tim 3 orang. Final di Jakarta + hadiah Rp 50 juta.",
+        organizer:"HIMA Manajemen UI (koordinator nasional)", location:"Online + Final Jakarta",
+        deadline:"2026-10-25", verify:"partner", local:false,
+        tags:["Lomba","Bisnis","Case"], added:5 },
+      { id:6, title:"International Student Innovation Challenge", type:"Lomba", scope:"Internasional",
+        desc:"Kompetisi inovasi mahasiswa tingkat Asia-Pasifik. Proposal dalam bahasa Inggris. Hadiah USD 5.000.",
+        organizer:"ASEAN University Network", location:"Online + Final Singapore",
+        deadline:"2026-11-20", verify:"partner", local:false,
+        tags:["Lomba","Inovasi","Internasional"], added:6 },
+      { id:7, title:"World University Debate Championship Qualifier", type:"Lomba", scope:"Internasional",
+        desc:"Kualifikasi Indonesia untuk kejuaraan debat universitas dunia. Bahasa Inggris. Coaching disediakan.",
+        organizer:"Indonesian Debate Association", location:"Online + Offline Jakarta",
+        deadline:"2026-10-30", verify:"partner", local:false,
+        tags:["Lomba","Debat","Internasional"], added:7 },
+      { id:8, title:"Lomba Karya Tulis Ilmiah Regional Sumsel-Babel", type:"Lomba", scope:"Regional",
+        desc:"LKTI tingkat regional Sumatera Selatan & Bangka Belitung. Tema: pembangunan berkelanjutan daerah.",
+        organizer:"Kopertis Wilayah II", location:"Palembang / Hybrid",
+        deadline:"2026-11-08", verify:"partner", local:true,
+        tags:["Lomba","Riset","Regional"], added:8 },
+
+      // BEASISWA
+      { id:9, title:"Beasiswa Bank Indonesia 2026", type:"Beasiswa", scope:"Nasional",
+        desc:"Beasiswa penuh untuk mahasiswa berprestasi ekonomi, bisnis, dan STEM. Tunjangan bulanan + mentoring.",
+        organizer:"Bank Indonesia", location:"Nasional",
+        deadline:"2026-10-15", verify:"partner", local:false,
+        tags:["Beasiswa","Ekonomi","Bisnis"], added:9 },
+      { id:10, title:"Beasiswa LPDP 2026 Batch 2", type:"Beasiswa", scope:"Internasional",
+        desc:"Beasiswa magister & doktor dalam & luar negeri. Sosialisasi khusus mahasiswa daerah + kuota afirmasi.",
+        organizer:"LPDP", location:"Nasional / Luar Negeri",
+        deadline:"2026-11-30", verify:"partner", local:false,
+        tags:["Beasiswa","S2","S3"], added:10 },
+      { id:11, title:"Beasiswa Unggulan Kemendikbud 2026", type:"Beasiswa", scope:"Nasional",
+        desc:"Beasiswa prestasi akademik & non-akademik. Cover SPP + biaya hidup. Kuota khusus daerah 3T.",
+        organizer:"Kemendikbudristek", location:"Nasional",
+        deadline:"2026-10-28", verify:"partner", local:false,
+        tags:["Beasiswa","Prestasi"], added:11 },
+      { id:12, title:"Beasiswa Prestasi Bank Sumsel Babel", type:"Beasiswa", scope:"Regional",
+        desc:"Beasiswa khusus mahasiswa berprestasi asal Sumsel & Babel. Cover SPP penuh 1 tahun.",
+        organizer:"Bank Sumsel Babel", location:"Regional Sumsel-Babel",
+        deadline:"2026-10-22", verify:"partner", local:true,
+        tags:["Beasiswa","Regional"], added:12 },
+      { id:13, title:"Chevening Scholarship UK 2027", type:"Beasiswa", scope:"Internasional",
+        desc:"Beasiswa penuh pemerintah Inggris untuk S2 di UK. Leadership + academic excellence. Fully funded.",
+        organizer:"UK Government / Chevening", location:"United Kingdom",
+        deadline:"2026-11-05", verify:"partner", local:false,
+        tags:["Beasiswa","S2","Internasional"], added:13 },
+
+      // MAGANG
+      { id:14, title:"Magang Digital Marketing — Startup Lokal", type:"Magang", scope:"Hybrid",
+        desc:"Magang 3 bulan di startup digital Babel. Cocok Bisnis Digital & Manajemen. Sertifikat + portofolio.",
+        organizer:"Babel Digital Hub", location:"Pangkalpinang / Hybrid",
+        deadline:"2026-09-30", verify:"partner", local:true,
+        tags:["Magang","Startup","Marketing"], added:14 },
+      { id:15, title:"Magang Riset Agroteknologi", type:"Magang", scope:"Riset",
+        desc:"Magang riset di lab & kebun percobaan UBB. Cocok semester 5+. Ada tunjangan transport.",
+        organizer:"Fakultas Pertanian UBB", location:"Kampus UBB",
+        deadline:"2026-10-25", verify:"kampus", local:true,
+        tags:["Magang","Riset"], added:15 },
+      { id:16, title:"Magang Admin & Finance UMKM Babel", type:"Magang", scope:"Full-time",
+        desc:"Magang 2–3 bulan membantu UMKM lokal (admin & keuangan). Cocok Akuntansi & Manajemen.",
+        organizer:"Dinas Koperasi & UMKM Babel", location:"Pangkalpinang",
+        deadline:"2026-11-05", verify:"partner", local:true,
+        tags:["Magang","Keuangan","UMKM"], added:16 },
+      { id:17, title:"Internship Data Analyst — Remote", type:"Magang", scope:"Hybrid",
+        desc:"Magang remote data analyst 4 bulan. Flexible hours. Cocok mahasiswa yang sudah belajar SQL/Python dasar.",
+        organizer:"Startup EdTech Nasional", location:"Remote / Online",
+        deadline:"2026-10-20", verify:"partner", local:false,
+        tags:["Magang","Data","Tech"], added:17 },
+      { id:18, title:"Magang Part-time Content Creator Kampus", type:"Magang", scope:"Part-time",
+        desc:"Bantu media sosial dan konten prodi. 10–15 jam/minggu. Cocok mahasiswa yang suka desain & writing.",
+        organizer:"Prodi Bisnis Digital UBB", location:"Kampus UBB",
+        deadline:"2026-10-14", verify:"kampus", local:true,
+        tags:["Magang","Content","Marketing"], added:18 },
+
+      // VOLUNTEER & PELATIHAN
+      { id:19, title:"Volunteer Festival Timah Babel", type:"Volunteer", scope:"Regional",
+        desc:"Relawan festival budaya & ekonomi lokal. Sertifikat resmi + networking industri & pemerintah daerah.",
+        organizer:"Pemprov Kep. Bangka Belitung", location:"Bangka",
+        deadline:"2026-10-20", verify:"partner", local:true,
+        tags:["Volunteer","Event"], added:19 },
+      { id:20, title:"Volunteer Pengajar Desa Digital", type:"Volunteer", scope:"Regional",
+        desc:"Mengajar literasi digital di desa Bangka. 1 bulan. Transport & konsumsi ditanggung. Sertifikat resmi.",
+        organizer:"Komunitas Relawan Babel", location:"Kab. Bangka",
+        deadline:"2026-11-15", verify:"komunitas", local:true,
+        tags:["Volunteer","Pendidikan","Tech"], added:20 },
+      { id:21, title:"Pelatihan Data Analytics untuk Mahasiswa", type:"Pelatihan", scope:"Kampus",
+        desc:"Workshop 2 hari: data analysis, dashboard, storytelling. Gratis khusus mahasiswa UBB.",
+        organizer:"Prodi Bisnis Digital UBB", location:"Kampus UBB",
+        deadline:"2026-10-08", verify:"kampus", local:true,
+        tags:["Pelatihan","Data","Skill"], added:21 },
+      { id:22, title:"Pelatihan Public Speaking & Leadership", type:"Pelatihan", scope:"Kampus",
+        desc:"Pelatihan intensif 3 hari public speaking & leadership. Sertifikat + coaching 1-on-1.",
+        organizer:"Unit Kegiatan Mahasiswa UBB", location:"Kampus UBB",
+        deadline:"2026-10-10", verify:"kampus", local:true,
+        tags:["Pelatihan","Skill","Leadership"], added:22 },
+    ];
+
+    let currentFilter = "all";
+    let currentSubFilter = "all";
+    let userProfile = { major: "", semester: "", interests: [] };
+    let savedIds = JSON.parse(localStorage.getItem("surlink_saved") || "[]");
+    let currentModalId = null;
+
+    function daysUntil(dateStr) {
+      const now = new Date(); now.setHours(0,0,0,0);
+      return Math.ceil((new Date(dateStr) - now) / 86400000);
+    }
+    function deadlineClass(d) {
+      if (d < 0 || d <= 5) return "urgent";
+      if (d <= 14) return "soon";
+      return "ok";
+    }
+    function deadlineText(d) {
+      if (d < 0) return "Sudah tutup";
+      if (d === 0) return "Hari ini!";
+      if (d === 1) return "Besok";
+      return d + " hari lagi";
+    }
+    function verifyLabel(v) {
+      if (v === "kampus") return { text: "✓ Verifikasi Kampus", cls: "verify-kampus" };
+      if (v === "partner") return { text: "✓ Partner Resmi", cls: "verify-partner" };
+      return { text: "Komunitas", cls: "verify-komunitas" };
+    }
+    function scopeBadge(scope) {
+      if (!scope) return "";
+      const map = {
+        "Internasional": "scope-internasional",
+        "Nasional": "scope-nasional",
+        "Regional": "scope-regional",
+        "Kampus": "scope-kampus",
+        "Full-time": "scope-nasional",
+        "Part-time": "scope-regional",
+        "Hybrid": "scope-online",
+        "Riset": "scope-kampus",
+      };
+      const cls = map[scope] || "scope-nasional";
+      const icons = {
+        "Internasional": "🌍", "Nasional": "🇮🇩", "Regional": "🗺️", "Kampus": "🏫",
+        "Full-time": "⏱", "Part-time": "📅", "Hybrid": "💻", "Riset": "🔬"
+      };
+      return `<span class="scope-badge ${cls}">${icons[scope] || ""} ${scope}</span>`;
+    }
+    function calcMatch(opp) {
+      if (!userProfile.major && userProfile.interests.length === 0) return null;
+      let score = 35;
+      if (userProfile.interests.includes(opp.type)) score += 25;
+      if (userProfile.interests.some(i => opp.tags.some(t => t.toLowerCase().includes(i.toLowerCase())))) score += 20;
+      if (userProfile.major === "Bisnis Digital" && (opp.tags.includes("Startup") || opp.tags.includes("Marketing") || opp.tags.includes("Data"))) score += 18;
+      if (userProfile.major === "Manajemen" && (opp.type === "Lomba" || opp.tags.includes("Bisnis"))) score += 14;
+      if (userProfile.major === "Akuntansi" && opp.tags.includes("Keuangan")) score += 16;
+      if (userProfile.major === "Agroteknologi" && opp.tags.includes("Riset")) score += 22;
+      if (userProfile.major === "Teknik Informatika" && opp.tags.includes("Tech")) score += 18;
+      if (userProfile.major === "Ilmu Hukum" && opp.tags.includes("Hukum")) score += 20;
+      if ((userProfile.semester === "5-6" || userProfile.semester === "7+") && (opp.type === "Magang" || opp.type === "Beasiswa")) score += 12;
+      if (userProfile.semester === "1-2" && (opp.type === "Pelatihan" || opp.type === "Volunteer")) score += 10;
+      return Math.min(98, Math.round(score));
+    }
+
+    function hideAllSubfilters() {
+      document.querySelectorAll(".subfilter-wrap").forEach(el => el.classList.remove("show"));
+    }
+    function showSubfilterFor(type) {
+      hideAllSubfilters();
+      const map = { Lomba: "subLomba", Beasiswa: "subBeasiswa", Magang: "subMagang" };
+      if (map[type]) {
+        const el = document.getElementById(map[type]);
+        el.classList.add("show");
+        // reset sub chips to "all"
+        el.querySelectorAll(".sub-chip").forEach(c => c.classList.remove("active"));
+        el.querySelector('.sub-chip[data-sub="all"]').classList.add("active");
+      }
+      currentSubFilter = "all";
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      showSubfilterFor(filter);
+      applyFilters();
+    }
+
+    function setSubFilter(sub, btn) {
+      currentSubFilter = sub;
+      const wrap = btn.closest(".subfilter-wrap");
+      wrap.querySelectorAll(".sub-chip").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = (document.getElementById("searchInput").value || "").toLowerCase().trim();
+      const sort = document.getElementById("sortSelect").value;
+
+      let list = opportunities.map(o => ({ ...o, match: calcMatch(o), days: daysUntil(o.deadline) }));
+
+      if (currentFilter !== "all") {
+        list = list.filter(o => o.type === currentFilter);
+      }
+      if (currentSubFilter !== "all") {
+        list = list.filter(o => o.scope === currentSubFilter);
+      }
+      if (search) {
+        list = list.filter(o =>
+          o.title.toLowerCase().includes(search) ||
+          o.desc.toLowerCase().includes(search) ||
+          o.organizer.toLowerCase().includes(search) ||
+          o.tags.some(t => t.toLowerCase().includes(search)) ||
+          o.type.toLowerCase().includes(search) ||
+          (o.scope && o.scope.toLowerCase().includes(search))
+        );
+      }
+      // Quick action flags
+      if (window._forceUrgent) {
+        list = list.filter(o => o.days >= 0 && o.days <= 14);
+      }
+      if (window._forceLocal) {
+        list = list.filter(o => o.local);
+      }
+      if (window._forceVerified) {
+        list = list.filter(o => o.verify === "kampus");
+      }
+      // Mood soft filter
+      if (window._mood === "ambisius") {
+        list = list.filter(o =>
+          o.scope === "Internasional" || o.scope === "Nasional" ||
+          o.type === "Beasiswa" || o.type === "Lomba"
+        );
+      } else if (window._mood === "santai") {
+        list = list.filter(o => o.type === "Pelatihan" || o.type === "Volunteer" || o.days > 10);
+      } else if (window._mood === "lokal") {
+        list = list.filter(o => o.local);
+      }
+      // Minat aktif: filter peluang yang relevan dengan minat
+      if (userProfile.interests.length > 0) {
+        list = list.filter(o => {
+          return userProfile.interests.some(i =>
+            o.type === i ||
+            o.tags.some(t => t.toLowerCase().includes(i.toLowerCase())) ||
+            (o.scope && o.scope.toLowerCase().includes(i.toLowerCase()))
+          );
+        });
+      }
+
+      if (sort === "match") list.sort((a, b) => (b.match || 0) - (a.match || 0) || a.days - b.days);
+      else if (sort === "newest") list.sort((a, b) => b.added - a.added);
+      else list.sort((a, b) => a.days - b.days);
+
+      renderCards(list);
+      updateCounts();
+      updateSearchChips();
+    }
+
+    function updateCounts() {
+      const types = ["all", "Beasiswa", "Lomba", "Magang", "Volunteer", "Pelatihan"];
+      types.forEach(t => {
+        const el = document.getElementById("count-" + t);
+        if (el) el.textContent = t === "all" ? opportunities.length : opportunities.filter(o => o.type === t).length;
+      });
+      document.getElementById("statOpp").textContent = opportunities.length;
+
+      // Lomba subcounts
+      const lombas = opportunities.filter(o => o.type === "Lomba");
+      const setSub = (prefix, scopes) => {
+        const allEl = document.getElementById("subcount-" + prefix + "-all");
+        if (allEl) allEl.textContent = scopes === "lomba" ? lombas.length :
+          scopes === "beasiswa" ? opportunities.filter(o => o.type === "Beasiswa").length :
+          opportunities.filter(o => o.type === "Magang").length;
+      };
+      document.getElementById("subcount-lomba-all").textContent = lombas.length;
+      ["Internasional","Nasional","Regional","Kampus"].forEach(s => {
+        const el = document.getElementById("subcount-lomba-" + s);
+        if (el) el.textContent = lombas.filter(o => o.scope === s).length;
+      });
+      const beas = opportunities.filter(o => o.type === "Beasiswa");
+      document.getElementById("subcount-beasiswa-all").textContent = beas.length;
+      ["Internasional","Nasional","Regional"].forEach(s => {
+        const el = document.getElementById("subcount-beasiswa-" + s);
+        if (el) el.textContent = beas.filter(o => o.scope === s).length;
+      });
+      const mags = opportunities.filter(o => o.type === "Magang");
+      document.getElementById("subcount-magang-all").textContent = mags.length;
+      ["Full-time","Part-time","Hybrid","Riset"].forEach(s => {
+        const el = document.getElementById("subcount-magang-" + s);
+        if (el) el.textContent = mags.filter(o => o.scope === s).length;
+      });
+    }
+
+    function renderCards(list) {
+      const grid = document.getElementById("cardGrid");
+      document.getElementById("resultCount").textContent = list.length + " peluang";
+      if (list.length === 0) {
+        grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><h3>Tidak ada peluang ditemukan</h3><p>Coba ubah filter, sub-filter, atau kata kunci.</p></div>`;
+        return;
+      }
+      grid.innerHTML = list.map(o => {
+        const v = verifyLabel(o.verify);
+        const isSaved = savedIds.includes(o.id);
+        const matchHtml = o.match !== null ? `<span class="match-badge">${o.match}% cocok</span>` : "";
+        return `
+          <article class="opp-card ${isSaved ? "saved-card" : ""} ${o.days >= 0 && o.days <= 5 ? "hot-deadline" : ""}" onclick="openModal(${o.id})">
+            ${o.days >= 0 && o.days <= 5 ? '<span class="sparkle">🔥</span>' : (o.match && o.match >= 80 ? '<span class="sparkle">✨</span>' : '')}
+            <div class="opp-card-top">
+              <div class="opp-meta">
+                <span class="opp-type type-${o.type.toLowerCase()}">${o.type}</span>
+                ${matchHtml}
+              </div>
+              <h3 class="opp-title">${o.title}</h3>
+              <p class="opp-desc">${o.desc}</p>
+              <div class="opp-badges">
+                ${scopeBadge(o.scope)}
+                <span class="verify-badge ${v.cls}">${v.text}</span>
+                ${o.local ? '<span class="local-badge">🏝️ Lokal</span>' : ""}
+              </div>
+            </div>
+            <div class="opp-footer">
+              <span class="deadline ${deadlineClass(o.days)}">⏱ ${deadlineText(o.days)}</span>
+              <div class="opp-footer-actions">
+                <button class="compare-toggle ${compareIds.includes(o.id) ? "on" : ""}" onclick="event.stopPropagation();toggleCompareId(${o.id})" title="Tambah ke bandingkan">${compareIds.includes(o.id) ? "✓" : "+"}</button>
+                <button class="save-btn" onclick="event.stopPropagation();toggleSave(${o.id})" title="Simpan">${isSaved ? "🔖" : "🏷️"}</button>
+              </div>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function openModal(id) {
+      const o = opportunities.find(x => x.id === id);
+      if (!o) return;
+      currentModalId = id;
+      const days = daysUntil(o.deadline);
+      const v = verifyLabel(o.verify);
+      const match = calcMatch(o);
+      document.getElementById("mType").textContent = o.type;
+      document.getElementById("mType").className = "opp-type type-" + o.type.toLowerCase();
+      document.getElementById("mTitle").textContent = o.title;
+      document.getElementById("mDesc").textContent = o.desc;
+      let badges = scopeBadge(o.scope) + `<span class="verify-badge ${v.cls}">${v.text}</span>`;
+      if (match !== null) badges += `<span class="match-badge">${match}% Match</span>`;
+      if (o.local) badges += `<span class="local-badge">🏝️ Lokal Babel</span>`;
+      document.getElementById("mBadges").innerHTML = badges;
+      document.getElementById("mDeadline").textContent = o.deadline + " · " + deadlineText(days);
+      document.getElementById("mOrganizer").textContent = o.organizer;
+      document.getElementById("mLocation").textContent = o.location;
+      if (o.scope) {
+        document.getElementById("mScopeRow").style.display = "flex";
+        document.getElementById("mScope").textContent = o.scope;
+      } else {
+        document.getElementById("mScopeRow").style.display = "none";
+      }
+      document.getElementById("mSaveBtn").textContent = savedIds.includes(id) ? "🔖 Tersimpan" : "🔖 Simpan";
+      const cmpBtn = document.getElementById("mCompareBtn");
+      if (cmpBtn) cmpBtn.textContent = compareIds.includes(id) ? "✓ Dalam bandingkan" : "⚖️ Bandingkan";
+      // Match explanation
+      const why = explainMatch(o);
+      const whyEl = document.getElementById("mMatchWhy");
+      if (whyEl) {
+        if (why && match !== null) {
+          whyEl.style.display = "block";
+          whyEl.innerHTML = "<strong>🎯 Kenapa " + match + "% cocok?</strong>" + why.map(r => "• " + r).join("<br>");
+        } else if (whyEl) {
+          whyEl.style.display = "none";
+        }
+      }
+      trackView(id);
+      renderChecklist(id);
+      updatePathSteps(id);
+      const noteEl = document.getElementById("mNotes");
+      if (noteEl) noteEl.value = personalNotes[id] || "";
+      document.getElementById("modal").classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+    function closeModal() {
+      document.getElementById("modal").classList.remove("show");
+      document.body.style.overflow = "";
+      currentModalId = null;
+    }
+    // setReminder replaced below
+
+    function toggleSaveFromModal() {
+      if (currentModalId) toggleSave(currentModalId);
+      document.getElementById("mSaveBtn").textContent = savedIds.includes(currentModalId) ? "🔖 Tersimpan" : "🔖 Simpan";
+    }
+
+    function toggleSave(id) {
+      if (savedIds.includes(id)) {
+        savedIds = savedIds.filter(x => x !== id);
+        showToast("Dihapus dari tersimpan");
+      } else {
+        savedIds.push(id);
+        showToast("🔖 Disimpan! Sully bangga padamu 🤩");
+        confetti();
+      }
+      localStorage.setItem("surlink_saved", JSON.stringify(savedIds));
+      updateSavedUI();
+      updateStreakPill();
+      updateMiniStats();
+      applyFilters();
+    }
+    function updateSavedUI() {
+      const badge = document.getElementById("savedCount");
+      if (savedIds.length > 0) { badge.style.display = "grid"; badge.textContent = savedIds.length; }
+      else badge.style.display = "none";
+      const body = document.getElementById("drawerBody");
+      if (savedIds.length === 0) {
+        body.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-icon">📭</div><h3>Belum ada yang disimpan</h3><p style="font-size:0.85rem;">Klik 🔖 pada kartu untuk menyimpan.</p></div>`;
+        return;
+      }
+      body.innerHTML = savedIds.map(id => {
+        const o = opportunities.find(x => x.id === id);
+        if (!o) return "";
+        return `<div class="saved-item" onclick="toggleDrawer();openModal(${o.id})"><h4>${o.title}</h4><p>${o.type}${o.scope ? " · " + o.scope : ""} · ${deadlineText(daysUntil(o.deadline))}</p></div>`;
+      }).join("");
+    }
+    function toggleDrawer() {
+      document.getElementById("drawer").classList.toggle("show");
+      document.getElementById("drawerOverlay").classList.toggle("show");
+    }
+
+    function toggleProfile() { document.getElementById("profilePanel").classList.toggle("show"); }
+    function updateProfile() {
+      userProfile.major = document.getElementById("profileMajor").value;
+      userProfile.semester = document.getElementById("profileSemester").value;
+    }
+    document.getElementById("interestTags").addEventListener("click", e => {
+      if (!e.target.classList.contains("interest-tag")) return;
+      e.target.classList.toggle("selected");
+      const val = e.target.dataset.val;
+      if (e.target.classList.contains("selected")) {
+        if (!userProfile.interests.includes(val)) userProfile.interests.push(val);
+      } else {
+        userProfile.interests = userProfile.interests.filter(i => i !== val);
+      }
+      // Live filter: minat aktif langsung menyaring feed
+      if (userProfile.interests.length > 0) {
+        document.getElementById("sortSelect").value = "match";
+      }
+      updateInterestBar();
+      applyFilters();
+      showToast(userProfile.interests.length
+        ? "Minat aktif: " + userProfile.interests.join(", ")
+        : "Filter minat dinonaktifkan");
+    });
+
+    function removeInterest(val) {
+      userProfile.interests = userProfile.interests.filter(i => i !== val);
+      document.querySelectorAll("#interestTags .interest-tag").forEach(t => {
+        if (t.dataset.val === val) t.classList.remove("selected");
+      });
+      updateInterestBar();
+      applyFilters();
+    }
+
+    function updateInterestBar() {
+      const bar = document.getElementById("interestActiveBar");
+      if (!userProfile.interests.length) {
+        bar.classList.remove("show");
+        bar.innerHTML = "";
+        return;
+      }
+      bar.classList.add("show");
+      bar.innerHTML = '<span class="interest-active-label">Minat aktif</span>' +
+        userProfile.interests.map(i =>
+          `<span class="active-chip">${i}<button type="button" onclick="removeInterest('${i}')" title="Hapus">×</button></span>`
+        ).join("") +
+        `<button type="button" class="nav-btn nav-btn-ghost" style="font-size:0.75rem;padding:0.25rem 0.6rem;" onclick="clearAllInterests()">Hapus semua</button>`;
+    }
+
+    function clearAllInterests() {
+      userProfile.interests = [];
+      document.querySelectorAll("#interestTags .interest-tag").forEach(t => t.classList.remove("selected"));
+      updateInterestBar();
+      applyFilters();
+      showToast("Semua minat dihapus");
+    }
+
+    function applyProfile() {
+      updateProfile();
+      const has = userProfile.major || userProfile.interests.length > 0;
+      document.getElementById("recoSub").textContent = has
+        ? "Rekomendasi dipersonalisasi untuk " + (userProfile.major || userProfile.interests.join(", ") || "minatmu")
+        : "Klik filter → sub-filter muncul (Lomba: Internasional / Nasional / dll.)";
+      if (has) document.getElementById("sortSelect").value = "match";
+      updateInterestBar();
+      applyFilters();
+      showToast("✅ Preferensi disimpan — minat aktif menyaring peluang!");
+      document.getElementById("profilePanel").classList.remove("show");
+    }
+
+    // ═══ SEARCH ═══
+    function onSearchInput() {
+      const q = document.getElementById("searchInput").value;
+      document.getElementById("searchClear").classList.toggle("show", q.length > 0);
+      renderSuggestions(q);
+      applyFilters();
+      updateSearchChips();
+    }
+    function onSearchFocus() {
+      const q = document.getElementById("searchInput").value;
+      renderSuggestions(q || " ");
+    }
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      document.getElementById("searchClear").classList.remove("show");
+      document.getElementById("searchSuggest").classList.remove("show");
+      applyFilters();
+      updateSearchChips();
+    }
+    function updateSearchChips() {
+      const bar = document.getElementById("searchChipsBar");
+      const q = (document.getElementById("searchInput").value || "").trim();
+      if (!q) { bar.classList.remove("show"); bar.innerHTML = ""; return; }
+      bar.classList.add("show");
+      bar.innerHTML = `<span class="active-chip">🔍 "${q}"<button type="button" onclick="clearSearch()" title="Hapus">×</button></span>`;
+    }
+    function renderSuggestions(q) {
+      const box = document.getElementById("searchSuggest");
+      const query = (q || "").trim().toLowerCase();
+      // quick filters + matching opportunities
+      const quick = [
+        { icon: "🏆", label: "Lomba Internasional", action: () => { setFilterByName("Lomba"); setSubByName("Internasional"); } },
+        { icon: "🇮🇩", label: "Lomba Nasional", action: () => { setFilterByName("Lomba"); setSubByName("Nasional"); } },
+        { icon: "🎓", label: "Beasiswa Luar Negeri", action: () => { setFilterByName("Beasiswa"); setSubByName("Internasional"); } },
+        { icon: "💼", label: "Magang Hybrid", action: () => { setFilterByName("Magang"); setSubByName("Hybrid"); } },
+        { icon: "🏫", label: "Peluang Kampus", action: () => { setFilterByName("Lomba"); setSubByName("Kampus"); } },
+      ];
+      let matches = opportunities.filter(o =>
+        !query || query === " " ? true :
+        o.title.toLowerCase().includes(query) ||
+        o.type.toLowerCase().includes(query) ||
+        (o.scope && o.scope.toLowerCase().includes(query)) ||
+        o.tags.some(t => t.toLowerCase().includes(query)) ||
+        o.organizer.toLowerCase().includes(query)
+      ).slice(0, 6);
+
+      const quickFiltered = query && query !== " "
+        ? quick.filter(x => x.label.toLowerCase().includes(query))
+        : quick.slice(0, 4);
+
+      if (!query && query !== " ") {
+        box.classList.remove("show");
+        return;
+      }
+
+      let html = "";
+      if (quickFiltered.length) {
+        html += `<div class="suggest-hint">Pintasan filter</div>`;
+        quickFiltered.forEach((x, i) => {
+          html += `<button type="button" class="suggest-item" data-qi="${i}" onmousedown="event.preventDefault()">
+            <span class="s-icon">${x.icon}</span>
+            <span class="s-text"><span class="s-title">${x.label}</span><span class="s-meta">Terapkan filter cepat</span></span>
+          </button>`;
+        });
+      }
+      if (matches.length && query && query !== " ") {
+        html += `<div class="suggest-hint">Peluang</div>`;
+        matches.forEach(o => {
+          html += `<button type="button" class="suggest-item" data-oid="${o.id}" onmousedown="event.preventDefault()">
+            <span class="s-icon">${o.type === "Lomba" ? "🏆" : o.type === "Beasiswa" ? "🎓" : o.type === "Magang" ? "💼" : "📌"}</span>
+            <span class="s-text"><span class="s-title">${o.title}</span><span class="s-meta">${o.type}${o.scope ? " · " + o.scope : ""} · ${o.organizer}</span></span>
+          </button>`;
+        });
+      }
+      if (!html) {
+        html = `<div class="suggest-empty">Tidak ada saran untuk "${query}"</div>`;
+      }
+      box.innerHTML = html;
+      box.classList.add("show");
+
+      // bind clicks
+      box.querySelectorAll("[data-qi]").forEach(btn => {
+        btn.onclick = () => {
+          const idx = +btn.dataset.qi;
+          // re-filter quick list same way
+          const qf = query && query !== " "
+            ? quick.filter(x => x.label.toLowerCase().includes(query))
+            : quick.slice(0, 4);
+          if (qf[idx]) { qf[idx].action(); box.classList.remove("show"); }
+        };
+      });
+      box.querySelectorAll("[data-oid]").forEach(btn => {
+        btn.onclick = () => {
+          box.classList.remove("show");
+          openModal(+btn.dataset.oid);
+        };
+      });
+    }
+    function setFilterByName(name) {
+      const btn = document.querySelector(`.filter-chip[data-filter="${name}"]`);
+      if (btn) setFilter(name, btn);
+    }
+    function setSubByName(name) {
+      setTimeout(() => {
+        const wrap = document.querySelector(".subfilter-wrap.show");
+        if (!wrap) return;
+        const btn = wrap.querySelector(`.sub-chip[data-sub="${name}"]`);
+        if (btn) setSubFilter(name, btn);
+      }, 30);
+    }
+    function onSearchKey(e) {
+      if (e.key === "Escape") {
+        document.getElementById("searchSuggest").classList.remove("show");
+        document.getElementById("searchInput").blur();
+      }
+      if (e.key === "Enter") {
+        document.getElementById("searchSuggest").classList.remove("show");
+        applyFilters();
+      }
+    }
+    // close suggest on outside click
+    document.addEventListener("click", e => {
+      const search = document.querySelector(".nav-search");
+      if (search && !search.contains(e.target)) {
+        document.getElementById("searchSuggest").classList.remove("show");
+      }
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.classList.add("show");
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove("show"), 2800);
+    }
+    function scrollTop() { window.scrollTo({ top: 0, behavior: "smooth" }); }
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        closeModal();
+        document.getElementById("drawer").classList.remove("show");
+        document.getElementById("drawerOverlay").classList.remove("show");
+      }
+    });
+
+
+    // ═══ EXTRA FUN FEATURES ═══
+    const tips = [
+      { e: "💡", t: "<strong>Tips:</strong> Klik minat di Profil — feed langsung terfilter sesuai minatmu." },
+      { e: "⏰", t: "<strong>Deadline alert:</strong> Kartu merah muda = deadline ≤ 5 hari. Segera daftar!" },
+      { e: "🏝️", t: "<strong>Tahu nggak?</strong> Badge 🏝️ Lokal berarti peluang di Bangka Belitung / UBB." },
+      { e: "🎯", t: "<strong>Match Score:</strong> Atur jurusan + semester + minat supaya skor % muncul." },
+      { e: "🔖", t: "<strong>Simpan dulu:</strong> Bookmark peluang biar tidak hilang di timeline." },
+      { e: "🌍", t: "<strong>Lomba Internasional:</strong> Filter Lomba → Internasional untuk tantangan global." },
+      { e: "�", t: "<strong>Sully bilang:</strong> Pelan-pelan tapi konsisten. Satu peluang per minggu sudah hebat!" },
+    ];
+    let tipIndex = Math.floor(Math.random() * tips.length);
+    function showTip() {
+      const tip = tips[tipIndex % tips.length];
+      const em = document.getElementById("tipEmoji");
+      const tx = document.getElementById("tipText");
+      if (em) em.textContent = tip.e;
+      if (tx) tx.innerHTML = tip.t;
+    }
+    function dismissTip() {
+      const b = document.getElementById("tipBanner");
+      if (b) b.style.display = "none";
+      try { sessionStorage.setItem("surlink_tip_dismissed", "1"); } catch(e) {}
+    }
+    function rotateTip() {
+      tipIndex++;
+      showTip();
+    }
+    setInterval(rotateTip, 12000);
+
+    const mascotLines = [
+      "Hai! Aku <strong>Sully</strong>, si ikan penjelajah peluang. Yuk cari yang cocok buatmu hari ini!",
+      "Psst… coba filter <strong>Deadline dekat</strong> biar tidak kelewatan 🔥",
+      "Sudah atur minat? Match Score-mu bisa naik sampai 98% lho!",
+      "Peluang lokal Babel sering sepi peminat — kesempatan lebih besar 🏝️",
+      "Simpan dulu, daftar nanti. Bookmark adalah sahabat terbaik mahasiswa 🔖",
+    ];
+    let mascotIdx = 0;
+    setInterval(() => {
+      mascotIdx = (mascotIdx + 1) % mascotLines.length;
+      const el = document.getElementById("mascotMsg");
+      if (el) el.innerHTML = mascotLines[mascotIdx];
+    }, 8000);
+
+    function filterUrgent() {
+      currentFilter = "all"; currentSubFilter = "all";
+      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      document.querySelector('.filter-chip[data-filter="all"]').classList.add("active");
+      hideAllSubfilters();
+      document.getElementById("searchInput").value = "";
+      document.getElementById("searchClear").classList.remove("show");
+      // custom: only urgent
+      window._forceUrgent = true;
+      window._forceLocal = false;
+      window._forceVerified = false;
+      applyFilters();
+      showToast("🔥 Menampilkan peluang dengan deadline ≤ 14 hari");
+      setTimeout(() => { window._forceUrgent = false; }, 100);
+    }
+    function filterLocal() {
+      currentFilter = "all"; currentSubFilter = "all";
+      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      document.querySelector('.filter-chip[data-filter="all"]').classList.add("active");
+      hideAllSubfilters();
+      window._forceLocal = true;
+      window._forceUrgent = false;
+      window._forceVerified = false;
+      applyFilters();
+      showToast("🏝️ Peluang lokal Bangka Belitung / UBB");
+      setTimeout(() => { window._forceLocal = false; }, 100);
+    }
+    function filterVerified() {
+      currentFilter = "all"; currentSubFilter = "all";
+      document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+      document.querySelector('.filter-chip[data-filter="all"]').classList.add("active");
+      hideAllSubfilters();
+      window._forceVerified = true;
+      window._forceUrgent = false;
+      window._forceLocal = false;
+      applyFilters();
+      showToast("✓ Hanya peluang Verifikasi Kampus");
+      setTimeout(() => { window._forceVerified = false; }, 100);
+    }
+    function surpriseMe() {
+      const pool = opportunities.filter(o => daysUntil(o.deadline) >= 0);
+      if (!pool.length) { showToast("Tidak ada peluang aktif"); return; }
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      openModal(pick.id);
+      showToast("🎲 Surprise! Coba deh peluang ini");
+      confetti();
+    }
+
+    function confetti() {
+      const colors = ["#0d9488", "#f59e0b", "#ef4444", "#8b5cf6", "#3b82f6", "#10b981"];
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement("div");
+        p.className = "confetti-piece";
+        p.style.left = (40 + Math.random() * 20) + "vw";
+        p.style.top = (30 + Math.random() * 20) + "vh";
+        p.style.background = colors[i % colors.length];
+        p.style.animationDelay = (Math.random() * 0.3) + "s";
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1400);
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      const dark = document.body.classList.contains("dark");
+      document.getElementById("themeToggle").textContent = dark ? "☀️" : "🌙";
+      // fix wave color
+      const wave = document.querySelector(".hero-wave path");
+      if (wave) wave.setAttribute("fill", dark ? "#0f172a" : "#f1f5f9");
+      try { localStorage.setItem("surlink_theme", dark ? "dark" : "light"); } catch(e) {}
+      showToast(dark ? "🌙 Mode gelap aktif" : "☀️ Mode terang aktif");
+    }
+
+    function shareSurlink() {
+      const text = "Coba SURLINK — satu tautan terverifikasi untuk peluang mahasiswa Bangka Belitung! 🐢✨";
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text + "\n" + location.href).catch(() => {});
+      }
+      confetti();
+      showToast("🔗 Link & pesan disalin! Siap dibagikan ke teman.");
+    }
+
+    function updateStreakPill() {
+      const el = document.getElementById("streakPill");
+      if (el) el.textContent = "⭐ " + savedIds.length + " tersimpan";
+    }
+
+    // restore theme
+    try {
+      if (localStorage.getItem("surlink_theme") === "dark") {
+        document.body.classList.add("dark");
+        document.getElementById("themeToggle").textContent = "☀️";
+        const wave = document.querySelector(".hero-wave path");
+        if (wave) wave.setAttribute("fill", "#0f172a");
+      }
+      if (sessionStorage.getItem("surlink_tip_dismissed") === "1") {
+        const b = document.getElementById("tipBanner");
+        if (b) b.style.display = "none";
+      }
+    } catch(e) {}
+
+
+    // ═══ HIGH-VALUE: notif, week, compare, checklist, recent, stats ═══
+    let compareIds = [];
+    let viewedIds = JSON.parse(localStorage.getItem("surlink_viewed") || "[]");
+    let reminders = JSON.parse(localStorage.getItem("surlink_reminders") || "[]");
+    let checklists = JSON.parse(localStorage.getItem("surlink_checklists") || "{}");
+    let notifRead = JSON.parse(localStorage.getItem("surlink_notif_read") || "[]");
+
+    const DEFAULT_CHECKS = [
+      "Baca syarat & ketentuan lengkap",
+      "Siapkan CV / portofolio terbaru",
+      "Siapkan dokumen pendukung (KTM, transkrip)",
+      "Tulis essay / motivasi jika diminta",
+      "Minta surat rekomendasi (jika perlu)",
+      "Submit sebelum deadline",
+    ];
+
+    function trackView(id) {
+      viewedIds = [id, ...viewedIds.filter(x => x !== id)].slice(0, 12);
+      localStorage.setItem("surlink_viewed", JSON.stringify(viewedIds));
+      updateRecent();
+      updateMiniStats();
+    }
+
+    function updateRecent() {
+      const row = document.getElementById("recentRow");
+      if (!row) return;
+      if (!viewedIds.length) { row.classList.remove("show"); return; }
+      row.classList.add("show");
+      row.innerHTML = '<span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);align-self:center;snow-space:nowrap">🕒 Baru dilihat</span>' +
+        viewedIds.slice(0, 6).map(id => {
+          const o = opportunities.find(x => x.id === id);
+          if (!o) return "";
+          return `<button class="recent-chip" onclick="openModal(${o.id})">${o.title.length > 28 ? o.title.slice(0, 26) + "…" : o.title}</button>`;
+        }).join("");
+    }
+
+    function updateMiniStats() {
+      const el = id => document.getElementById(id);
+      if (el("smViewed")) el("smViewed").textContent = viewedIds.length;
+      if (el("smSaved")) el("smSaved").textContent = savedIds.length;
+      if (el("smRemind")) el("smRemind").textContent = reminders.length;
+      // avg match of visible with profile
+      if (userProfile.major || userProfile.interests.length) {
+        const scores = opportunities.map(calcMatch).filter(m => m !== null);
+        const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+        if (el("smMatch")) el("smMatch").textContent = avg + "%";
+      } else if (el("smMatch")) el("smMatch").textContent = "—";
+    }
+
+    function renderWeekFocus() {
+      const wrap = document.getElementById("weekItems");
+      if (!wrap) return;
+      const soon = opportunities
+        .map(o => ({ ...o, days: daysUntil(o.deadline) }))
+        .filter(o => o.days >= 0 && o.days <= 14)
+        .sort((a, b) => a.days - b.days)
+        .slice(0, 6);
+      if (!soon.length) {
+        wrap.innerHTML = '<p style="font-size:0.85rem;opacity:0.9">Tidak ada deadline dalam 14 hari — santai dulu 😎</p>';
+        return;
+      }
+      wrap.innerHTML = soon.map(o => `
+        <div class="week-card" onclick="openModal(${o.id})">
+          <div class="wc-type">${o.type}${o.scope ? " · " + o.scope : ""}</div>
+          <div class="wc-title">${o.title}</div>
+          <div class="wc-due">⏱ ${deadlineText(o.days)}</div>
+        </div>`).join("");
+    }
+
+    function buildNotifications() {
+      const items = [];
+      // deadline warnings for saved + all urgent
+      opportunities.forEach(o => {
+        const d = daysUntil(o.deadline);
+        if (d >= 0 && d <= 5) {
+          items.push({
+            id: "dl-" + o.id, oid: o.id,
+            ico: d <= 2 ? "🚨" : "⏰",
+            title: d === 0 ? `Deadline HARI INI: ${o.title}` : `Deadline ${d} hari: ${o.title}`,
+            meta: o.type + " · " + o.organizer,
+            urgent: d <= 2
+          });
+        }
+      });
+      reminders.forEach(rid => {
+        const o = opportunities.find(x => x.id === rid);
+        if (!o) return;
+        const d = daysUntil(o.deadline);
+        if (d >= 0) {
+          items.push({
+            id: "rm-" + rid, oid: rid,
+            ico: "🔔",
+            title: `Reminder aktif: ${o.title}`,
+            meta: deadlineText(d) + " · siap daftar?",
+            urgent: false
+          });
+        }
+      });
+      // tip notif
+      if (userProfile.interests.length === 0) {
+        items.push({
+          id: "tip-minat", oid: null,
+          ico: "🎯",
+          title: "Atur minat untuk rekomendasi personal",
+          meta: "Buka Profil → pilih minat",
+          urgent: false
+        });
+      }
+      return items;
+    }
+
+    function renderNotifs() {
+      const list = document.getElementById("notifList");
+      const badge = document.getElementById("notifCount");
+      if (!list) return;
+      const items = buildNotifications();
+      const unread = items.filter(i => !notifRead.includes(i.id)).length;
+      if (badge) {
+        if (unread > 0) { badge.style.display = "grid"; badge.textContent = unread; }
+        else badge.style.display = "none";
+      }
+      if (!items.length) {
+        list.innerHTML = '<div class="notif-empty">📭 Tidak ada notifikasi<br><span style="font-size:0.78rem">Reminder & deadline akan muncul di sini</span></div>';
+        return;
+      }
+      list.innerHTML = items.map(i => `
+        <div class="notif-item ${notifRead.includes(i.id) ? "" : "unread"}" onclick="clickNotif('${i.id}', ${i.oid})">
+          <span class="n-ico">${i.ico}</span>
+          <div class="n-body">
+            <div class="n-title">${i.title}</div>
+            <div class="n-meta">${i.meta}</div>
+          </div>
+        </div>`).join("");
+    }
+
+    function toggleNotif(e) {
+      e.stopPropagation();
+      const p = document.getElementById("notifPanel");
+      const bd = document.getElementById("notifBackdrop");
+      const open = !p.classList.contains("show");
+      p.classList.toggle("show", open);
+      if (bd) bd.classList.toggle("show", open);
+      if (open) renderNotifs();
+    }
+    function closeNotif() {
+      const p = document.getElementById("notifPanel");
+      const bd = document.getElementById("notifBackdrop");
+      if (p) p.classList.remove("show");
+      if (bd) bd.classList.remove("show");
+    }
+    function clickNotif(nid, oid) {
+      if (!notifRead.includes(nid)) {
+        notifRead.push(nid);
+        localStorage.setItem("surlink_notif_read", JSON.stringify(notifRead));
+      }
+      closeNotif();
+      if (oid) openModal(oid);
+      else toggleProfile();
+      renderNotifs();
+    }
+    function markAllNotifRead() {
+      buildNotifications().forEach(i => {
+        if (!notifRead.includes(i.id)) notifRead.push(i.id);
+      });
+      localStorage.setItem("surlink_notif_read", JSON.stringify(notifRead));
+      renderNotifs();
+      showToast("Semua notifikasi ditandai dibaca");
+    }
+    document.addEventListener("click", e => {
+      const btn = document.getElementById("notifBtn");
+      const panel = document.getElementById("notifPanel");
+      if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+        closeNotif();
+      }
+    });
+
+    function explainMatch(opp) {
+      const reasons = [];
+      if (!userProfile.major && !userProfile.interests.length) return null;
+      if (userProfile.interests.includes(opp.type)) reasons.push(`Minatmu mencakup tipe <b>${opp.type}</b>`);
+      userProfile.interests.forEach(i => {
+        if (opp.tags.some(t => t.toLowerCase().includes(i.toLowerCase())) && i !== opp.type)
+          reasons.push(`Tag terkait minat <b>${i}</b>`);
+      });
+      if (userProfile.major === "Bisnis Digital" && (opp.tags.includes("Startup") || opp.tags.includes("Data") || opp.tags.includes("Marketing")))
+        reasons.push(`Cocok untuk jurusan <b>Bisnis Digital</b>`);
+      if (userProfile.major === "Manajemen" && (opp.type === "Lomba" || opp.tags.includes("Bisnis")))
+        reasons.push(`Relevan untuk jurusan <b>Manajemen</b>`);
+      if (userProfile.major === "Akuntansi" && opp.tags.includes("Keuangan"))
+        reasons.push(`Cocok untuk jurusan <b>Akuntansi</b>`);
+      if (userProfile.major === "Teknik Informatika" && opp.tags.includes("Tech"))
+        reasons.push(`Cocok untuk jurusan <b>Teknik Informatika</b>`);
+      if (userProfile.major === "Agroteknologi" && opp.tags.includes("Riset"))
+        reasons.push(`Cocok untuk jurusan <b>Agroteknologi</b>`);
+      if (userProfile.major === "Ilmu Hukum" && opp.tags.includes("Hukum"))
+        reasons.push(`Cocok untuk jurusan <b>Ilmu Hukum</b>`);
+      if ((userProfile.semester === "5-6" || userProfile.semester === "7+") && (opp.type === "Magang" || opp.type === "Beasiswa"))
+        reasons.push(`Semester <b>${userProfile.semester}</b> cocok untuk ${opp.type.toLowerCase()}`);
+      if ((userProfile.semester === "1-2") && (opp.type === "Pelatihan" || opp.type === "Volunteer"))
+        reasons.push(`Cocok untuk mahasiswa baru (semester ${userProfile.semester})`);
+      if (opp.local) reasons.push(`Peluang <b>lokal Babel/UBB</b> — akses lebih dekat`);
+      return reasons.length ? reasons : ["Profilmu sudah diisi — skor dihitung dari kecocokan umum"];
+    }
+
+    function renderChecklist(id) {
+      const box = document.getElementById("mChecklist");
+      const itemsEl = document.getElementById("mCheckItems");
+      const fill = document.getElementById("mCheckFill");
+      if (!box) return;
+      // show checklist if saved or has progress
+      const state = checklists[id] || DEFAULT_CHECKS.map(() => false);
+      if (!savedIds.includes(id) && !state.some(Boolean)) {
+        box.style.display = "none";
+        return;
+      }
+      box.style.display = "block";
+      if (!checklists[id]) checklists[id] = DEFAULT_CHECKS.map(() => false);
+      itemsEl.innerHTML = DEFAULT_CHECKS.map((label, i) => `
+        <label class="check-item ${checklists[id][i] ? "done" : ""}">
+          <input type="checkbox" ${checklists[id][i] ? "checked" : ""} onchange="toggleCheck(${id}, ${i})" />
+          <span>${label}</span>
+        </label>`).join("");
+      const done = checklists[id].filter(Boolean).length;
+      const pct = Math.round(done / DEFAULT_CHECKS.length * 100);
+      fill.style.width = pct + "%";
+    }
+    function toggleCheck(id, idx) {
+      if (!checklists[id]) checklists[id] = DEFAULT_CHECKS.map(() => false);
+      checklists[id][idx] = !checklists[id][idx];
+      localStorage.setItem("surlink_checklists", JSON.stringify(checklists));
+      renderChecklist(id);
+      const done = checklists[id].filter(Boolean).length;
+      if (done === DEFAULT_CHECKS.length) {
+        showToast("🎉 Checklist selesai! Siap submit �");
+        confetti();
+      }
+    }
+
+    function toggleCompareId(id) {
+      if (compareIds.includes(id)) compareIds = compareIds.filter(x => x !== id);
+      else {
+        if (compareIds.length >= 3) {
+          showToast("Maksimal 3 peluang untuk dibandingkan");
+          return;
+        }
+        compareIds.push(id);
+      }
+      updateCompareBar();
+      applyFilters();
+    }
+    function toggleCompareFromModal() {
+      if (currentModalId) toggleCompareId(currentModalId);
+      const btn = document.getElementById("mCompareBtn");
+      if (btn) btn.textContent = compareIds.includes(currentModalId) ? "✓ Dalam bandingkan" : "⚖️ Bandingkan";
+    }
+    function updateCompareBar() {
+      const bar = document.getElementById("compareBar");
+      const chips = document.getElementById("compareChips");
+      if (!bar) return;
+      if (!compareIds.length) { bar.classList.remove("show"); return; }
+      bar.classList.add("show");
+      chips.innerHTML = compareIds.map(id => {
+        const o = opportunities.find(x => x.id === id);
+        return `<span class="compare-chip">${o ? o.title.slice(0, 22) + (o.title.length > 22 ? "…" : "") : id}
+          <button onclick="toggleCompareId(${id})">×</button></span>`;
+      }).join("");
+    }
+    function clearCompare() {
+      compareIds = [];
+      updateCompareBar();
+      applyFilters();
+    }
+    function openCompare() {
+      if (compareIds.length < 2) {
+        showToast("Pilih minimal 2 peluang (centang di kartu)");
+        return;
+      }
+      const ops = compareIds.map(id => opportunities.find(x => x.id === id)).filter(Boolean);
+      const rows = [
+        ["Judul", ...ops.map(o => o.title)],
+        ["Tipe", ...ops.map(o => o.type)],
+        ["Tingkat/Jenis", ...ops.map(o => o.scope || "—")],
+        ["Deadline", ...ops.map(o => o.deadline + " (" + deadlineText(daysUntil(o.deadline)) + ")")],
+        ["Penyelenggara", ...ops.map(o => o.organizer)],
+        ["Lokasi", ...ops.map(o => o.location)],
+        ["Verifikasi", ...ops.map(o => verifyLabel(o.verify).text)],
+        ["Match Score", ...ops.map(o => { const m = calcMatch(o); return m !== null ? m + "%" : "Atur profil"; })],
+        ["Lokal Babel", ...ops.map(o => o.local ? "Ya 🏝️" : "Tidak")],
+      ];
+      let table = '<table class="compare-table"><tbody>';
+      rows.forEach((r, i) => {
+        table += "<tr>";
+        r.forEach((cell, j) => {
+          table += i === 0 && j > 0 ? `<td><strong>${cell}</strong></td>` :
+            j === 0 ? `<th>${cell}</th>` : `<td>${cell}</td>`;
+        });
+        table += "</tr>";
+      });
+      table += "</tbody></table>";
+      table += '<div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap">' +
+        ops.map(o => `<button class="btn btn-primary" style="font-size:0.8rem;padding:0.45rem 0.9rem" onclick="closeCompare();openModal(${o.id})">Detail: ${o.type}</button>`).join("") +
+        "</div>";
+      document.getElementById("compareBody").innerHTML = table;
+      document.getElementById("compareModal").classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+    function closeCompare() {
+      document.getElementById("compareModal").classList.remove("show");
+      document.body.style.overflow = "";
+    }
+
+    function startApply() {
+      if (currentModalId && !savedIds.includes(currentModalId)) {
+        savedIds.push(currentModalId);
+        localStorage.setItem("surlink_saved", JSON.stringify(savedIds));
+        updateSavedUI();
+        updateStreakPill();
+        updateMiniStats();
+      }
+      if (currentModalId) {
+        renderChecklist(currentModalId);
+        showToast("✅ Siap daftar! Centang checklist persiapan di bawah ya");
+        confetti();
+      }
+    }
+
+    // patch setReminder to store
+    function setReminder() {
+      if (currentModalId && !reminders.includes(currentModalId)) {
+        reminders.push(currentModalId);
+        localStorage.setItem("surlink_reminders", JSON.stringify(reminders));
+        updateMiniStats();
+        renderNotifs();
+      }
+      showToast("🔔 Reminder disimpan! Cek ikon lonceng untuk notifikasi.");
+      confetti();
+      closeModal();
+    }
+
+
+    // ═══ Mood, Digest, Notes, Path, Lucky ═══
+    let currentMood = localStorage.getItem("surlink_mood") || "";
+    let personalNotes = JSON.parse(localStorage.getItem("surlink_notes") || "{}");
+    let digestTarget = null;
+
+    function setMood(btn, mood) {
+      document.querySelectorAll(".mood-btn").forEach(b => b.classList.remove("active"));
+      if (currentMood === mood) {
+        currentMood = "";
+        localStorage.removeItem("surlink_mood");
+        showToast("Mood dinonaktifkan");
+      } else {
+        currentMood = mood;
+        btn.classList.add("active");
+        localStorage.setItem("surlink_mood", mood);
+        const msgs = {
+          ambisius: "🚀 Mode ambisius: prioritas internasional & nasional!",
+          eksplor: "🧭 Mode eksplor: campur semua tipe peluang",
+          santai: "😎 Mode santai: pelatihan & volunteer dulu",
+          lokal: "🏝️ Mode lokal: fokus Babel & UBB"
+        };
+        showToast(msgs[mood] || "Mood disetel");
+      }
+      applyMoodFilter();
+      refreshDigest();
+    }
+
+    function applyMoodFilter() {
+      // mood influences sort and soft filter via flags
+      window._mood = currentMood;
+      if (currentMood === "ambisius") {
+        setFilterByName("all");
+        document.getElementById("sortSelect").value = "deadline";
+      } else if (currentMood === "lokal") {
+        window._forceLocal = true;
+        applyFilters();
+        setTimeout(() => { window._forceLocal = false; }, 50);
+        return;
+      } else if (currentMood === "santai") {
+        // show pelatihan + volunteer preferred via search clear and type
+        currentFilter = "all";
+        document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+        document.querySelector('.filter-chip[data-filter="all"]').classList.add("active");
+        hideAllSubfilters();
+      }
+      applyFilters();
+    }
+
+    // patch applyFilters mood soft boost - inject via wrapping is hard; filter in applyFilters
+    // We add mood filtering in a hook after interests - search for forceVerified block
+
+    function refreshDigest() {
+      const el = document.getElementById("digestText");
+      if (!el) return;
+      let pool = opportunities.map(o => ({ ...o, days: daysUntil(o.deadline), match: calcMatch(o) }))
+        .filter(o => o.days >= 0);
+      if (currentMood === "ambisius") {
+        pool = pool.filter(o => o.scope === "Internasional" || o.scope === "Nasional" || o.type === "Beasiswa");
+      } else if (currentMood === "lokal") {
+        pool = pool.filter(o => o.local);
+      } else if (currentMood === "santai") {
+        pool = pool.filter(o => o.type === "Pelatihan" || o.type === "Volunteer");
+      }
+      if (userProfile.interests.length) {
+        const pref = pool.filter(o => userProfile.interests.some(i =>
+          o.type === i || o.tags.some(t => t.toLowerCase().includes(i.toLowerCase()))
+        ));
+        if (pref.length) pool = pref;
+      }
+      pool.sort((a, b) => (b.match || 0) - (a.match || 0) || a.days - b.days);
+      if (!pool.length) {
+        el.textContent = "Belum ada saran cocok. Coba ubah mood atau minat di Profil.";
+        digestTarget = null;
+        return;
+      }
+      const top = pool.slice(0, 3);
+      digestTarget = top[0];
+      const lines = top.map((o, i) =>
+        `${i + 1}. ${o.title} (${deadlineText(o.days)}${o.match ? ", " + o.match + "% cocok" : ""})`
+      );
+      el.innerHTML = "Rekomendasi teratas:<br>" + lines.join("<br>");
+    }
+
+    function applyDigestFilter() {
+      if (!digestTarget) { refreshDigest(); }
+      if (digestTarget) {
+        openModal(digestTarget.id);
+        showToast("🎯 Membuka saran terbaik untukmu");
+      }
+    }
+
+    function saveNote() {
+      if (!currentModalId) return;
+      const val = document.getElementById("mNotes").value;
+      personalNotes[currentModalId] = val;
+      localStorage.setItem("surlink_notes", JSON.stringify(personalNotes));
+    }
+
+    function updatePathSteps(id) {
+      const wrap = document.getElementById("mPathSteps");
+      if (!wrap) return;
+      wrap.style.display = "flex";
+      const viewed = viewedIds.includes(id);
+      const saved = savedIds.includes(id);
+      const reminded = reminders.includes(id);
+      const checks = checklists[id] || [];
+      const ready = checks.filter(Boolean).length >= 3;
+      const steps = [
+        ["ps1", viewed],
+        ["ps2", saved],
+        ["ps3", reminded],
+        ["ps4", ready],
+        ["ps5", ready && saved],
+      ];
+      steps.forEach(([pid, on]) => {
+        const el = document.getElementById(pid);
+        if (el) el.classList.toggle("done", !!on);
+      });
+    }
+
+    function luckyDraw() {
+      const pool = opportunities.filter(o => daysUntil(o.deadline) >= 0);
+      if (!pool.length) return;
+      // weighted: prefer high match or local
+      let weighted = [];
+      pool.forEach(o => {
+        const m = calcMatch(o) || 40;
+        const w = Math.max(1, Math.round(m / 20)) + (o.local ? 2 : 0);
+        for (let i = 0; i < w; i++) weighted.push(o);
+      });
+      const pick = weighted[Math.floor(Math.random() * weighted.length)];
+      confetti();
+      openModal(pick.id);
+      showToast("🐠 Ikan keberuntungan memilih peluang ini!");
+    }
+
+    // restore mood UI
+    if (currentMood) {
+      const btn = document.querySelector(`.mood-btn[data-mood="${currentMood}"]`);
+      if (btn) btn.classList.add("active");
+    }
+
+    window._mood = currentMood;
+    showTip();
+    updateSavedUI();
+    updateStreakPill();
+    updateMiniStats();
+    updateRecent();
+    renderWeekFocus();
+    renderNotifs();
+    refreshDigest();
+    applyFilters();
+  </script>
+</body>
+</html>
